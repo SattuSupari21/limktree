@@ -1,9 +1,10 @@
-import {Button} from '@nextui-org/button';
+import Landing from "@/app/components/Landing/Landing";
+import Container from "@/app/components/Container";
 
 export default function Home() {
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
-            <Button>Click me</Button>
-        </main>
+        <Container>
+            <Landing/>
+        </Container>
     )
 }
