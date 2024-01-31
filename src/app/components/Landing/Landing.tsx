@@ -4,8 +4,9 @@ import HeroSection from "@/app/components/Landing/components/HeroSection";
 export default function Landing() {
     return (
         <div className="w-full h-full">
-            <Header/>
-            <HeroSection/>
+            <Header>
+                <HeroSection/>
+            </Header>
         </div>
     )
 }
