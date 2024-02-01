@@ -1,5 +1,10 @@
-import Header from "@/app/components/Landing/components/Header";
+import Header from "@/app/components/landing/components/Header";
 
 export default function Features() {
-    return <Header>Features</Header>
+    return (
+        <div>
+            <Header/>
+            Features
+        </div>
+    )
 }

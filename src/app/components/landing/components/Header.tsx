@@ -1,4 +1,6 @@
-import React from "react";
+"use client"
+
+import React, {useEffect, useState} from "react";
 import {
     Navbar,
     NavbarBrand,
@@ -7,15 +9,56 @@ import {
     Link,
     Button,
     NavbarMenuToggle,
-    NavbarMenu, NavbarMenuItem
+    NavbarMenu, NavbarMenuItem, Spinner, Progress, Skeleton
 } from "@nextui-org/react";
 
-export default function Header({children}: { children: React.ReactNode }) {
+export default function Header() {
     const menuItems = [
         "Features",
         "About",
         "Login"
     ];
+
+    const [user, setUser] = useState({email: ""})
+    const [isLoading, setIsLoading] = useState(false)
+
+    // useEffect(() => {
+    //     setInterval(() => {
+    //         setUser({email: ""})
+    //         setIsLoading(false)
+    //     }, 1200);
+    // })
+
+    function RenderAuthButtons() {
+        if (isLoading) return <Skeleton className="flex rounded-full w-10 h-10 "/>
+
+        return (
+            <NavbarContent justify="end">
+                <NavbarItem className="hidden lg:flex">
+                    <Button as={Link} color="primary" href="/auth/login" variant="bordered">
+                        Login
+                    </Button>
+                </NavbarItem>
+                <NavbarItem>
+                    <Button as={Link} color="secondary" href="/auth/signup" variant="bordered">
+                        Sign Up
+                    </Button>
+                </NavbarItem>
+            </NavbarContent>
+        )
+    }
+
+    function RenderUserAccount() {
+        return (
+            <NavbarContent justify="end">
+                <NavbarItem className="hidden lg:flex">
+                    <Button as={Link} color="success" href="/auth/login" variant="bordered">
+                        User Account
+                    </Button>
+                </NavbarItem>
+            </NavbarContent>
+        )
+    }
 
     return (
         <div>
@@ -46,18 +89,7 @@ export default function Header({children}: { children: React.ReactNode }) {
                     </NavbarItem>
                 </NavbarContent>
 
-                <NavbarContent justify="end">
-                    <NavbarItem className="hidden lg:flex">
-                        <Button as={Link} color="primary" href="/auth/login" variant="bordered">
-                            Login
-                        </Button>
-                    </NavbarItem>
-                    <NavbarItem>
-                        <Button as={Link} color="secondary" href="/auth/signup" variant="bordered">
-                            Sign Up
-                        </Button>
-                    </NavbarItem>
-                </NavbarContent>
+                {!isLoading && user.email.length > 0 ? <RenderUserAccount/> : <RenderAuthButtons/>}
 
                 <NavbarMenu>
                     {menuItems.map((item, index) => (
@@ -73,7 +105,6 @@ export default function Header({children}: { children: React.ReactNode }) {
                     ))}
                 </NavbarMenu>
             </Navbar>
-            {children}
         </div>
 
     );
