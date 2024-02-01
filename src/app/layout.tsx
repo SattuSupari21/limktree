@@ -1,27 +1,24 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type {Metadata} from "next";
 import "./globals.css";
 import {Providers} from "@/app/providers";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Lynks",
-  description: "Lynks",
+    title: "Limktree",
+    description: "Lynks",
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
+                                       children,
+                                   }: Readonly<{
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>
-      <Providers>
-        {children}
-      </Providers>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+        <body>
+        <Providers>
+            {children}
+        </Providers>
+        </body>
+        </html>
+    );
 }
