@@ -5,7 +5,7 @@ import React from "react";
 
 export default function HeroSection() {
     return (
-        <div className="flex flex-col justify-center items-center xl:px-56 lg:px-28 sm:p-28 py-36 gap-8">
+        <div className="flex flex-col justify-center items-center xl:px-72 lg:px-28 sm:p-28 py-36 gap-8">
             <div className="flex flex-col items-center gap-4">
                 <p className="text-8xl font-bold text-center">Everything you are. In one, simple link in bio.</p>
                 <p className="text-2xl text-center">Join 40M+ people using Linktree for their link in bio. One link to
@@ -17,7 +17,7 @@ export default function HeroSection() {
             <div className="flex justify-center items-center gap-2">
                 <Input type="text" placeholder="lynks/yourname" variant={'faded'} size={'sm'} className="flex-1"/>
                 <Button as={Link} color="primary" href="#" variant="shadow" className="font-medium">
-                    Claim your lynks
+                    Claim your limks
                 </Button>
             </div>
         </div>
