@@ -1,10 +1,11 @@
 import Landing from "@/app/components/landing/Landing";
 import Container from "@/app/components/Container";
 
-export default function Home() {
+export default async function Home() {
     return (
-        <Container>
-            <Landing/>
-        </Container>
-    )
+        // <Container>
+        <Landing/>
+        // </Container>
+    );
 }
+

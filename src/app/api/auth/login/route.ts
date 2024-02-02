@@ -17,7 +17,12 @@ export async function POST(req: NextRequest) {
         let userId = user.id
         const token = generateToken(userId)
 
-        return new NextResponse(JSON.stringify({token}), {
+        return new NextResponse(JSON.stringify({
+            token,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email
+        }), {
             status: 200,
         });
     } catch (error) {
