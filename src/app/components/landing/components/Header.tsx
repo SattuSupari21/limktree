@@ -16,6 +16,7 @@ import {
 import {useRecoilValue} from "recoil";
 import {userEmailState} from "@/store/selectors/userEmail";
 import {isUserLoading} from "@/store/selectors/isUserLoading";
+import {ThemeSwitcher} from "@/app/components/ThemeSwitcher";
 
 export default function Header() {
     const menuItems = ["Features", "About", "Login"];
@@ -25,7 +26,7 @@ export default function Header() {
 
     function RenderAuthButtons() {
         if (userLoading)
-            return <Skeleton className="flex rounded-full w-10 h-10 "/>;
+            return <Skeleton className="flex rounded-full w-10 h-10"/>;
 
         return (
             <NavbarContent justify="end">
@@ -79,13 +80,13 @@ export default function Header() {
 
                 <NavbarContent className="sm:hidden pr-3" justify="center">
                     <NavbarBrand>
-                        <p className="font-bold text-inherit">Lynks</p>
+                        <p className="font-bold text-inherit">limktree</p>
                     </NavbarBrand>
                 </NavbarContent>
 
                 <NavbarContent className="hidden sm:flex gap-4" justify="center">
                     <NavbarBrand>
-                        <p className="font-bold text-2xl text-inherit">Lynks</p>
+                        <p className="font-bold text-2xl text-inherit">limktree</p>
                     </NavbarBrand>
                     <NavbarItem>
                         <Link color="foreground" href="/features">
@@ -99,11 +100,16 @@ export default function Header() {
                     </NavbarItem>
                 </NavbarContent>
 
-                {!userLoading && userEmail ? (
-                    <RenderUserAccount/>
-                ) : (
-                    <RenderAuthButtons/>
-                )}
+                <NavbarContent justify={'end'}>
+                    <NavbarItem><ThemeSwitcher/></NavbarItem>
+                    <NavbarItem>
+                        {!userLoading && userEmail ? (
+                            <RenderUserAccount/>
+                        ) : (
+                            <RenderAuthButtons/>
+                        )}
+                    </NavbarItem>
+                </NavbarContent>
 
                 <NavbarMenu>
                     {menuItems.map((item, index) => (

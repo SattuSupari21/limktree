@@ -3,9 +3,9 @@ import Container from "@/app/components/Container";
 
 export default async function Home() {
     return (
-        // <Container>
-        <Landing/>
-        // </Container>
+        <Container>
+            <Landing/>
+        </Container>
     );
 }
 
