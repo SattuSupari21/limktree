@@ -61,7 +61,7 @@ export default function Header() {
                     <Button
                         as={Link}
                         color="success"
-                        href="/auth/login"
+                        href="/dashboard"
                         variant="bordered"
                     >
                         Dashboard

@@ -8,13 +8,25 @@ import FormButton from "@/app/components/auth/FormButton";
 import BottomWarning from "@/app/components/auth/BottomWarning";
 import {IoMdArrowBack} from "react-icons/io";
 import {useRouter} from "next/navigation";
+import {LoginUser, SignupUser} from "@/app/actions";
+import {useSetRecoilState} from "recoil";
+import {userState} from "@/store/atoms/user";
 
 export default function Signup() {
     const router = useRouter();
+    const setUser = useSetRecoilState((userState));
     const [firstname, setFirstname] = useState("")
     const [lastname, setLastname] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [customUrl, setCustomUrl] = useState("")
+
+    function handleUserSignup() {
+        SignupUser({firstname, lastname, email, password, customUrl}).then(function (result) {
+            setUser({isLoading: false, firstname: result.firstname, lastname: result.lastname, email: result.email})
+            router.push('/')
+        })
+    }
 
     return (
         <div className='w-screen h-screen flex justify-center items-center'>
@@ -33,8 +45,10 @@ export default function Signup() {
                     <InputBox label={"Email"} type={"email"} placeholder={"johndoe@example.com"}
                               onChange={(e) => setEmail(e.target.value)}/>
                     <InputBox label={"Password"} type={"password"} placeholder={"1234567"}
-                              onChange={(e) => setEmail(e.target.value)}/>
-                    <FormButton label={"Sign Up"} onClick={() => console.log('click')}/>
+                              onChange={(e) => setPassword(e.target.value)}/>
+                    <InputBox label={"Custom URL"} type={"text"} placeholder={"Username"}
+                              onChange={(e) => setCustomUrl(e.target.value)}/>
+                    <FormButton label={"Sign Up"} onClick={handleUserSignup}/>
                 </CardBody>
                 <CardFooter className='justify-end'>
                     <BottomWarning label={"Already have an account?"} linkLabel={"Log In"} link={"/auth/login"}/>
