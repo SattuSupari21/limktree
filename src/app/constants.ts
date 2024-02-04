@@ -1,3 +1,6 @@
+import {FaDiscord, FaGithub, FaInstagram, FaLinkedin, FaReddit, FaTelegram, FaYoutube} from "react-icons/fa6";
+import {MdOutlineEmail} from "react-icons/md";
+
 export const aboutSections = [{
     heading: "🚀 Our Mission:",
     description: " At Limktree, our mission is to empower individuals, creators, and businesses to showcase their unique stories and offerings through a personalized link hub. We're here to revolutionize the way you share content, engage with your audience, and leave a lasting impression."
@@ -33,3 +36,14 @@ export const aboutSections = [{
         "\n" +
         "[Sign Up Now] [Explore Themes] [Contact Us]"
 }]
+
+export const buttons = [
+    {key: 'discord', label: 'Discord', icon: FaDiscord},
+    {key: 'github', label: 'GitHub', icon: FaGithub},
+    {key: 'email', label: 'Email', icon: MdOutlineEmail},
+    {key: 'instagram', label: 'Instagram', icon: FaInstagram},
+    {key: 'reddit', label: 'Reddit', icon: FaReddit},
+    {key: 'linkedin', label: 'LinkedIn', icon: FaLinkedin},
+    {key: 'youtube', label: 'Youtube', icon: FaYoutube},
+    {key: 'telegram', label: 'Telegram', icon: FaTelegram},
+]
