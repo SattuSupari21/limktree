@@ -58,3 +58,18 @@ export async function GetUserLinks() {
 
     return res.data;
 }
+
+export async function CreateNewLink({title, url, position}: { title: string, url: string, position: number }) {
+    const res = await axios.post("http://localhost:3000/api/user/createLink", {
+        title,
+        url,
+        position
+    }, {
+        withCredentials: true,
+        headers: {
+            Cookie: cookies().toString(),
+        }
+    });
+
+    return res.data;
+}

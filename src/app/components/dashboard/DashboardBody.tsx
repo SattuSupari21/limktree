@@ -3,7 +3,7 @@ import {Button} from "@nextui-org/react";
 import React from "react";
 import UserInformationCard from "@/app/components/dashboard/UserInformationCard";
 import GeneralInformationCard from "@/app/components/dashboard/GeneralInformationCard";
-import UserLinksCard from "@/app/components/dashboard/UserLinksCard";
+import LinkButtonsCard from "@/app/components/dashboard/LinkButtonsCard";
 
 
 export default function DashboardBody() {
@@ -15,7 +15,7 @@ export default function DashboardBody() {
             </Button>
             <UserInformationCard/>
             <GeneralInformationCard/>
-            <UserLinksCard/>
+            <LinkButtonsCard/>
         </div>
     )
 }
