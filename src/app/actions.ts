@@ -48,3 +48,13 @@ export async function GetUser() {
     return res.data;
 }
 
+export async function GetUserLinks() {
+    const res = await axios.get("http://localhost:3000/api/user/getLinks", {
+        withCredentials: true,
+        headers: {
+            Cookie: cookies().toString(),
+        },
+    })
+
+    return res.data;
+}
