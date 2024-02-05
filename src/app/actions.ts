@@ -60,7 +60,7 @@ export async function GetUserLinks() {
 }
 
 export async function CreateNewLink({title, url, position}: { title: string, url: string, position: number }) {
-    const res = await axios.post("http://localhost:3000/api/user/createLink", {
+    const res = await axios.post("http://localhost:3000/api/link/createLink", {
         title,
         url,
         position
@@ -69,6 +69,16 @@ export async function CreateNewLink({title, url, position}: { title: string, url
         headers: {
             Cookie: cookies().toString(),
         }
+    });
+
+    return res.data;
+}
+
+export async function DeleteLink(linkId: number) {
+    const res = await axios.delete("http://localhost:3000/api/link/deleteLink", {
+        headers: {Cookie: cookies().toString()},
+        withCredentials: true,
+        data: {linkId},
     });
 
     return res.data;
