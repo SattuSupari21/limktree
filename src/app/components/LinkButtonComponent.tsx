@@ -1,12 +1,14 @@
-import {Button, Card, CardBody, CardHeader, Image} from "@nextui-org/react";
-import React, {useEffect, useState} from "react";
-import {CreateNewLink, GetUserLinks} from "@/app/actions";
+import {Button, CircularProgress} from "@nextui-org/react";
+import {useEffect, useMemo, useRef, useState} from "react";
+import {CreateNewLink, DeleteLink, GetUserLinks} from "@/app/actions";
 import {FaPlus} from "react-icons/fa6";
 import {Input} from "@nextui-org/input";
 import {buttons} from "@/app/constants";
 import {IconBaseProps, IconType} from "react-icons";
 import {IoMdSave} from "react-icons/io";
 import {AiOutlineDelete} from "react-icons/ai";
+import {useRecoilState} from "recoil";
+import {linkState} from "@/store/atoms/links";
 
 type LinkButton = {
     key: string,
@@ -23,11 +25,11 @@ type Link = {
 }
 
 export default function LinkButtonComponent() {
+    const [linksLoading, setLinksLoading] = useRecoilState(linkState);
     const [links, setLinks] = useState([]);
-    const [url, setUrl] = useState("");
+    const inputRef = useRef(null);
     const [activeButtons, setActiveButtons] = useState([]);
-
-    let availableButtons = buttons.filter(b => !activeButtons.find((btn: LinkButton) => btn.key === b.key))
+    const [availableButtons, setAvailableButtons] = useState(buttons.filter(b => !activeButtons.find((btn: LinkButton) => btn.key === b.key)));
 
     useEffect(() => {
         GetUserLinks().then(function (result) {
@@ -35,7 +37,19 @@ export default function LinkButtonComponent() {
         })
     }, []);
 
-    availableButtons = buttons.filter((b: LinkButton) => !links.find((l: Link) => l.title === b.label))
+    useEffect(() => {
+        setLinksLoading({isLoading: false});
+    }, [links]);
+
+
+    useMemo(() => {
+        // @ts-ignore
+        setActiveButtons(buttons.filter((b: LinkButton) => links.find((l: Link) => l.title === b.label)))
+    }, [links])
+
+    useMemo(() => {
+        setAvailableButtons(buttons.filter(b => !activeButtons.find((btn: LinkButton) => btn.key === b.key)))
+    }, [activeButtons]);
 
     function addButton(button: LinkButton) {
         // @ts-ignore
@@ -47,10 +61,24 @@ export default function LinkButtonComponent() {
     function handleNewLink(button: LinkButton) {
         const title = button.label
         const position = links.length + 1;
-        if (url.length < 1) return
-        CreateNewLink({title, url, position}).then(function (result) {
-            console.log(result.newLink)
+        if (!inputRef.current) return
+        // @ts-ignore
+        CreateNewLink({title, url: inputRef.current.value, position}).then(function (result) {
             if (result.newLink) {
+                GetUserLinks().then(function (result) {
+                    setLinks(result.links);
+                })
+            }
+        })
+    }
+
+    function handleDeleteLink(button: LinkButton) {
+        setActiveButtons(activeButtons.filter((b: LinkButton) => b.key !== button.key))
+        // @ts-ignore
+        const linkToDelete: Link = links.find((link: Link) => link.title === button.label);
+        if (!linkToDelete) return
+        DeleteLink(linkToDelete.id).then(function (result) {
+            if (result.deleteLink) {
                 GetUserLinks().then(function (result) {
                     setLinks(result.links);
                 })
@@ -68,18 +96,22 @@ export default function LinkButtonComponent() {
                 </div>
                 <div className="flex justify-center items-center col-span-3 w-full gap-2">
                     <Input variant={'underlined'} type={"text"} placeholder={"URL"} value={value} size={'sm'}
-                           onChange={(e) => setUrl(e.target.value)}/>
+                           ref={inputRef}/>
                     <Button isIconOnly color="success" variant="faded" aria-label="save link"
                             onClick={() => handleNewLink(button)}>
                         <IoMdSave/>
                     </Button>
                     <Button isIconOnly color="danger" variant="faded" aria-label="delete link"
-                            onClick={() => setActiveButtons(activeButtons.filter((b: LinkButton) => b.key !== button.key))}>
+                            onClick={() => handleDeleteLink(button)}>
                         <AiOutlineDelete/>
                     </Button>
                 </div>
             </div>
         )
+    }
+
+    if (linksLoading.isLoading) {
+        return <div className="grid place-items-center"><CircularProgress size="lg" aria-label="Loading..."/></div>
     }
 
     return (
@@ -95,7 +127,10 @@ export default function LinkButtonComponent() {
                 })}
             </div>
             <div>
-                {activeButtons.map((button: LinkButton) => <UserLinksComponent button={button}/>)}
+                {activeButtons.map((button: LinkButton) => {
+                    if (!links.find((l: Link) => l.title === button.label))
+                        return <UserLinksComponent key={button.key} button={button}/>
+                })}
             </div>
 
             <div className="flex flex-wrap justify-center gap-2 mt-4">
