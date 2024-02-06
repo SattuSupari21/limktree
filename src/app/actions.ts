@@ -37,6 +37,24 @@ export async function SignupUser({firstname, lastname, email, password, customUr
     }
 }
 
+export async function UpdateUser({firstname, lastname, description}: {
+    firstname: string,
+    lastname: string,
+    description?: string
+}) {
+    const res = await axios.post("http://localhost:3000/api/user/updateUser", {
+        firstname,
+        lastname,
+        description
+    }, {
+        withCredentials: true,
+        headers: {Cookie: cookies().toString()},
+    });
+    if (res.status === 200) {
+        return res.data;
+    }
+}
+
 export async function GetUser() {
     const res = await axios.get("http://localhost:3000/api/user/getUser", {
         withCredentials: true,

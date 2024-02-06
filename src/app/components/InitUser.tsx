@@ -15,6 +15,7 @@ export function InitUser() {
                 firstname: result.firstname,
                 lastname: result.lastname,
                 email: result.email,
+                description: result.description,
                 isLoading: false,
             });
         });
