@@ -6,7 +6,7 @@ import {InitUser} from "@/app/components/InitUser";
 
 export const metadata: Metadata = {
     title: "Limktree",
-    description: "Lynks",
+    description: "Limktree",
 };
 
 export default function RootLayout({children}: Readonly<{

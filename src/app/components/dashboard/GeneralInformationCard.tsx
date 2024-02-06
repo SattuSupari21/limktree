@@ -1,20 +1,22 @@
+"use client"
+
 import {Button, Card, CardBody, CardHeader, Divider} from "@nextui-org/react";
 import InputBox from "@/app/components/auth/InputBox";
 import {IoMdSave} from "react-icons/io";
 import {AiOutlineDelete} from "react-icons/ai";
-import React, {useState} from "react";
-import {useRecoilState, useSetRecoilState} from "recoil";
+import React, {useEffect, useState} from "react";
+import {useRecoilState, useRecoilValue} from "recoil";
 import {userState} from "@/store/atoms/user";
 import toast from "react-hot-toast";
 import {UpdateUser} from "@/app/actions";
-
-type User = {
-    firstname: string,
-    lastname: string,
-    description?: string
-}
+import {userDetailState} from "@/store/selectors/userDetails";
+import {isUserLoading} from "@/store/selectors/isUserLoading";
 
 export default function GeneralInformationCard() {
+
+    const userDetails = useRecoilValue(userDetailState);
+    const userLoading = useRecoilValue(isUserLoading);
+
     const [user, setUser] = useRecoilState(userState);
     const [firstname, setFirstname] = useState(user.firstname ? user.firstname : "");
     const [lastname, setLastName] = useState(user.lastname ? user.lastname : "");
@@ -25,7 +27,7 @@ export default function GeneralInformationCard() {
         setLastName(user.lastname ? user.lastname : "");
         setDescription(user.description ? user.description : "");
     }
-
+    
     function handleUserUpdate() {
         toast.promise(
             // @ts-ignore

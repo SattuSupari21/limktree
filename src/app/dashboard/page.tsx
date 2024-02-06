@@ -3,6 +3,7 @@
 import Header from "@/app/components/landing/components/Header";
 import DashboardBody from "@/app/components/dashboard/DashboardBody";
 import React from "react";
+import {InitUser} from "@/app/components/InitUser";
 
 export default function Dashboard() {
     return (

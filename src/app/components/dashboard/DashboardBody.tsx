@@ -6,7 +6,6 @@ import UserInformationCard from "@/app/components/dashboard/UserInformationCard"
 import GeneralInformationCard from "@/app/components/dashboard/GeneralInformationCard";
 import LinkButtonsCard from "@/app/components/dashboard/LinkButtonsCard";
 
-
 export default function DashboardBody() {
     const router = useRouter();
     return (
