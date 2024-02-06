@@ -16,6 +16,31 @@ export async function POST(req: NextRequest) {
         }
 
         const {title, url, position} = await req.json();
+
+        const titleExists = await prisma.link.findFirst({
+            where: {
+                title
+            }
+        })
+        if (titleExists) {
+            const newLink = await prisma.link.update({
+                where: {
+                    id: titleExists.id
+                },
+                data: {
+                    title,
+                    url,
+                    position
+                }
+            })
+            return new NextResponse(
+                JSON.stringify({
+                    message: 'Successfully updated link',
+                    newLink
+                }),
+            );
+        }
+
         const newLink = await prisma.link.create({
             data: {
                 userId,
