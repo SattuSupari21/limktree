@@ -1,5 +1,5 @@
 import {Button, CircularProgress} from "@nextui-org/react";
-import {useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {CreateNewLink, DeleteLink, GetUserLinks} from "@/app/actions";
 import {FaPlus} from "react-icons/fa6";
 import {Input} from "@nextui-org/input";
@@ -9,6 +9,7 @@ import {IoMdSave} from "react-icons/io";
 import {AiOutlineDelete} from "react-icons/ai";
 import {useRecoilState} from "recoil";
 import {linkState} from "@/store/atoms/links";
+import toast, {Toaster} from "react-hot-toast";
 
 type LinkButton = {
     key: string,
@@ -33,14 +34,10 @@ export default function LinkButtonComponent() {
 
     useEffect(() => {
         GetUserLinks().then(function (result) {
+            setLinksLoading({isLoading: false});
             setLinks(result.links);
         })
     }, []);
-
-    useEffect(() => {
-        setLinksLoading({isLoading: false});
-    }, [links]);
-
 
     useMemo(() => {
         // @ts-ignore
@@ -62,14 +59,24 @@ export default function LinkButtonComponent() {
         const title = button.label
         const position = links.length + 1;
         if (!inputRef.current) return
-        // @ts-ignore
-        CreateNewLink({title, url: inputRef.current.value, position}).then(function (result) {
-            if (result.newLink) {
-                GetUserLinks().then(function (result) {
-                    setLinks(result.links);
-                })
+
+        toast.promise(
+            // @ts-ignore
+            CreateNewLink({title, url: inputRef.current.value, position}).then(function (result) {
+                if (result.newLink) {
+                    GetUserLinks().then(function (result) {
+                        setLinks(result.links);
+                    })
+                }
+            }),
+            {
+                loading: 'Saving...',
+                success: <b>Link created successfully!</b>,
+                error: <b>Could not save.</b>,
             }
-        })
+        ).then(() => {
+            return
+        });
     }
 
     function handleDeleteLink(button: LinkButton) {
@@ -77,13 +84,24 @@ export default function LinkButtonComponent() {
         // @ts-ignore
         const linkToDelete: Link = links.find((link: Link) => link.title === button.label);
         if (!linkToDelete) return
-        DeleteLink(linkToDelete.id).then(function (result) {
-            if (result.deleteLink) {
-                GetUserLinks().then(function (result) {
-                    setLinks(result.links);
-                })
+
+        toast.promise(
+            // @ts-ignore
+            DeleteLink(linkToDelete.id).then(function (result) {
+                if (result.deleteLink) {
+                    GetUserLinks().then(function (result) {
+                        setLinks(result.links);
+                    })
+                }
+            }),
+            {
+                loading: 'Deleting...',
+                success: <b>Link deleted successfully</b>,
+                error: <b>Could not save.</b>,
             }
-        })
+        ).then(() => {
+            return
+        });
     }
 
     function UserLinksComponent({button, value}: { button: LinkButton, value?: string }) {
@@ -95,16 +113,21 @@ export default function LinkButtonComponent() {
                     <p>{button.label}</p>
                 </div>
                 <div className="flex justify-center items-center col-span-3 w-full gap-2">
-                    <Input variant={'underlined'} type={"text"} placeholder={"URL"} value={value} size={'sm'}
+                    <Input variant={'underlined'} type={"text"} placeholder={"URL"} defaultValue={value} size={'sm'}
                            ref={inputRef}/>
                     <Button isIconOnly color="success" variant="faded" aria-label="save link"
-                            onClick={() => handleNewLink(button)}>
+                            onClick={() => {
+                                handleNewLink(button)
+                            }}>
                         <IoMdSave/>
                     </Button>
                     <Button isIconOnly color="danger" variant="faded" aria-label="delete link"
-                            onClick={() => handleDeleteLink(button)}>
+                            onClick={() => {
+                                handleDeleteLink(button)
+                            }}>
                         <AiOutlineDelete/>
                     </Button>
+                    <Toaster/>
                 </div>
             </div>
         )
