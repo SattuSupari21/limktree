@@ -6,6 +6,7 @@ export const userState = atom({
         isLoading: true,
         firstname: null,
         lastname: null,
+        description: null,
         email: null
     }
 })
