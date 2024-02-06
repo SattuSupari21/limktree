@@ -27,14 +27,17 @@ export default function HeroSection() {
     }
 
     return (
-        <div className="flex flex-col justify-center items-center xl:px-72 lg:px-28 sm:p-28 py-36 gap-8">
+        <div className="flex flex-col justify-center items-center mt-8 xl:px-72 lg:px-28 sm:p-20 py-36 gap-8">
             <div className="flex flex-col items-center gap-4">
-                <p className="text-8xl font-bold text-center">Everything you are. In one, simple link in bio.</p>
-                <p className="text-2xl text-center">Join 40M+ people using Linktree for their link in bio. One link to
-                    help you
-                    share everything you
-                    create, curate and sell from your Instagram, TikTok, Twitter, YouTube and other social media
-                    profiles.</p>
+                <p className="text-6xl font-bold text-center">Streamline Your Social Presence with limktree! 🚀</p>
+                <p className="text-xl text-center">Connect with your audience effortlessly by organizing all your
+                    important links in one place. Whether
+                    you're a content creator, business owner, or influencer, our platform makes it easy to share your
+                    social media profiles, websites, products, and more with a single link.</p>
+                <p className="text-xl text-center">Get started in minutes and unlock the full potential of your online
+                    presence. Sign up now and join
+                    thousands of users who are simplifying their social sharing experience with limktree
+                    !</p>
             </div>
             <div>
                 {userEmail && !userLoading ?
