@@ -20,7 +20,13 @@ export default function Login() {
 
     function handleUserLogin() {
         LoginUser({email, password}).then(function (result) {
-            setUser({isLoading: false, firstname: result.firstname, lastname: result.lastname, email: result.email})
+            setUser({
+                isLoading: false,
+                firstname: result.firstname,
+                lastname: result.lastname,
+                email: result.email,
+                description: result.description
+            })
             router.push('/')
         })
     }

@@ -44,7 +44,8 @@ export async function POST(req: NextRequest) {
             token,
             firstname: newUser.firstname,
             lastname: newUser.lastname,
-            email: newUser.email
+            email: newUser.email,
+            description: newUser.description
         }), {
             status: 200,
         });
