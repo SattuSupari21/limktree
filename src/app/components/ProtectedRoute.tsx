@@ -1,32 +1,36 @@
-"use client"
+"use client";
 
-import {useRouter} from 'next/navigation';
-import React, {useEffect, useState} from 'react';
+import {useRouter} from "next/navigation";
+import React, {useEffect, useState} from "react";
 import {GetUser} from "@/app/actions";
 import {CircularProgress} from "@nextui-org/react";
+import {useRecoilValue} from "recoil";
+import {userEmailState} from "@/store/selectors/userEmail";
 
 const ProtectedRoute = ({children}: { children: React.JSX.Element }) => {
     const router = useRouter();
+
+    const userEmail = useRecoilValue(userEmailState);
+
     const [isUserLoading, setIsUserLoading] = useState(true);
 
     useEffect(() => {
-        let isLoggedIn;
         GetUser().then(function (result) {
-            if (result.message === "Error") isLoggedIn = false;
-            else {
-                isLoggedIn = true;
+            if (result.message === "Error" || result.message === "Error: Invalid token") {
+                setIsUserLoading(false);
+            } else {
                 setIsUserLoading(false);
             }
         })
-
-        if (!isLoggedIn) {
-            router.push('/auth/login');
-        }
     }, []);
+
+    if (!userEmail && !isUserLoading) {
+        router.push('/auth/login');
+    }
 
     if (isUserLoading) return <CircularProgress color="default" aria-label="Loading..." size={'lg'}/>
 
-    return <>{children}</>;
+    if (!isUserLoading && userEmail) return <>{children}</>;
 };
 
 export default ProtectedRoute;

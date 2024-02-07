@@ -21,7 +21,8 @@ export async function POST(req: NextRequest) {
             token,
             firstname: user.firstname,
             lastname: user.lastname,
-            email: user.email
+            email: user.email,
+            description: user.description
         }), {
             status: 200,
         });

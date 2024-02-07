@@ -14,7 +14,7 @@ import {userState} from "@/store/atoms/user";
 
 export default function Signup() {
     const router = useRouter();
-    const setUser = useSetRecoilState((userState));
+    const setUser = useSetRecoilState(userState);
     const [firstname, setFirstname] = useState("")
     const [lastname, setLastname] = useState("")
     const [email, setEmail] = useState("")
@@ -23,7 +23,13 @@ export default function Signup() {
 
     function handleUserSignup() {
         SignupUser({firstname, lastname, email, password, customUrl}).then(function (result) {
-            setUser({isLoading: false, firstname: result.firstname, lastname: result.lastname, email: result.email})
+            setUser({
+                isLoading: false,
+                firstname: result.firstname,
+                lastname: result.lastname,
+                email: result.email,
+                description: result.description
+            })
             router.push('/')
         })
     }

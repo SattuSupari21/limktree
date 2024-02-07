@@ -1,8 +1,12 @@
 import {Card, CardBody, Image, Link} from "@nextui-org/react";
 import {FaLink} from "react-icons/fa6";
 import React from "react";
+import {useRecoilValue} from "recoil";
+import {userState} from "@/store/atoms/user";
 
 export default function UserInformationCard() {
+    const user = useRecoilValue(userState);
+
     return <div>
         <p className="text-4xl font-bold mb-4">User Dashboard</p>
         <Card>
@@ -13,12 +17,13 @@ export default function UserInformationCard() {
                         <Image
                             isBlurred={true}
                             alt="user profile image"
-                            src="https://d2qp0siotla746.cloudfront.net/img/use-cases/profile-picture/template_3.jpg"
+                            // src="https://d2qp0siotla746.cloudfront.net/img/use-cases/profile-picture/template_3.jpg"
+                            src={"/profile.jpg"}
                         />
                     </div>
                     <div className="grid place-items-center">
-                        <p className="text-xl font-semibold">Samtu Sumpari</p>
-                        <Link href="/" className="text-white" isExternal={true}><FaLink
+                        <p className="text-xl font-semibold">{user.firstname} {user.lastname}</p>
+                        <Link href="/samtu" className="text-white" isExternal={true}><FaLink
                             className="mr-1"/>limktree.com/samtu</Link>
                     </div>
                 </div>

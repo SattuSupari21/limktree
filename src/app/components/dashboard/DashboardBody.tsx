@@ -1,5 +1,5 @@
 import {IoMdArrowBack} from "react-icons/io";
-import {Button} from "@nextui-org/react";
+import {Button, Link} from "@nextui-org/react";
 import React from "react";
 import {useRouter} from "next/navigation";
 import UserInformationCard from "@/app/components/dashboard/UserInformationCard";

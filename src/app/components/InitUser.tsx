@@ -1,23 +1,34 @@
 "use client"
 
-import {useSetRecoilState} from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
 import {userState} from "@/store/atoms/user";
 import {GetUser} from "@/app/actions";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
+import {userEmailState} from "@/store/selectors/userEmail";
 
 export function InitUser() {
     const setUser = useSetRecoilState(userState);
+    const user = useRecoilValue(userEmailState);
 
     const init = () => {
-        const user = GetUser();
-        user.then(function (result) {
-            setUser({
-                firstname: result.firstname,
-                lastname: result.lastname,
-                email: result.email,
-                description: result.description,
-                isLoading: false,
-            });
+        GetUser().then(function (result) {
+            if (result.error) {
+                setUser({
+                    firstname: null,
+                    lastname: null,
+                    email: null,
+                    description: null,
+                    isLoading: false,
+                });
+            } else {
+                setUser({
+                    firstname: result.firstname,
+                    lastname: result.lastname,
+                    email: result.email,
+                    description: result.description,
+                    isLoading: false,
+                });
+            }
         });
     }
 

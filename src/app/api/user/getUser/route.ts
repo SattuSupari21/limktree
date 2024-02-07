@@ -6,13 +6,12 @@ export async function GET(req: NextRequest) {
     try {
         const token = req.cookies.get("auth")?.value;
 
-        if (!token) return new NextResponse(JSON.stringify({message: "Error"}));
+        if (!token) return new NextResponse(JSON.stringify({message: "Error"}), {status: 404});
 
         const userId = parseInt(<string>verifyToken(token));
         if (!userId)
             return new NextResponse(
-                JSON.stringify({message: "Error: Invalid token"}),
-            );
+                JSON.stringify({message: "Error: Invalid token"}), {status: 404});
 
         const user = await prisma.user.findUnique({
             where: {

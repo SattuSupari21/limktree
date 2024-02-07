@@ -2,6 +2,8 @@
 
 import axios from "axios";
 import {cookies} from "next/headers";
+import {prisma} from "../../lib/db";
+import {revalidatePath} from "next/cache";
 
 export async function LoginUser({email, password}: {
     email: string;
@@ -56,14 +58,17 @@ export async function UpdateUser({firstname, lastname, description}: {
 }
 
 export async function GetUser() {
-    const res = await axios.get("http://localhost:3000/api/user/getUser", {
-        withCredentials: true,
-        headers: {
-            Cookie: cookies().toString(),
-        },
-    });
-
-    return res.data;
+    try {
+        const res = await axios.get("http://localhost:3000/api/user/getUser", {
+            withCredentials: true,
+            headers: {
+                Cookie: cookies().toString(),
+            },
+        });
+        return res.data;
+    } catch (e) {
+        return {error: 'error logging in'}
+    }
 }
 
 export async function GetUserLinks() {
@@ -100,4 +105,37 @@ export async function DeleteLink(linkId: number) {
     });
 
     return res.data;
+}
+
+export async function GetLinks(customUrl: string) {
+    const userId = await prisma.userSettings.findUnique({
+        where: {
+            customUrl
+        },
+        select: {
+            userId: true
+        }
+    }).then(response => response?.userId)
+
+    if (!userId) return {error: "Invalid customUrls"}
+
+    const links = await prisma.link.findMany({
+        where: {
+            userId
+        }
+    })
+
+    const userDetails = await prisma.user.findUnique({
+        where: {
+            id: userId
+        },
+        select: {
+            firstname: true,
+            lastname: true,
+            description: true
+        }
+    })
+
+    return {links, userDetails};
+
 }
