@@ -190,6 +190,9 @@ export async function GetUserLinks() {
             where: {
                 userId
             },
+            orderBy: {
+                position: 'asc'
+            }
         });
 
         if (!links) return {message: "No links found", status: 200};
@@ -307,4 +310,38 @@ export async function GetLinks(customUrl: string) {
         }
     })
     return {links, userDetails, status: 200};
+}
+
+export async function UpdateLinksPosition({firstId, firstPosition, secondId, secondPosition}: {
+    firstId: number,
+    firstPosition: number,
+    secondId: number,
+    secondPosition: number
+}) {
+    try {
+        await prisma.link.update({
+            where: {
+                id: firstId
+            },
+            data: {
+                position: secondPosition
+            }
+        })
+        await prisma.link.update({
+            where: {
+                id: secondId
+            },
+            data: {
+                position: firstPosition
+            }
+        })
+        revalidatePath('/dashboard')
+        return {
+            message: 'Successfully updated user',
+            status: 200
+        }
+
+    } catch (error) {
+        return {error: (error as Error).message};
+    }
 }
