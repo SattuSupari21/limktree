@@ -1,21 +1,37 @@
 "use server";
 
-import axios from "axios";
 import {cookies} from "next/headers";
 import {prisma} from "../../lib/db";
+import {generateToken, verifyToken} from "../../utils/auth";
 import {revalidatePath} from "next/cache";
 
 export async function LoginUser({email, password}: {
     email: string;
     password: string;
 }) {
-    const res = await axios.post("http://localhost:3000/api/auth/login", {
-        email,
-        password,
-    });
-    if (res.status === 200) {
-        cookies().set("auth", res.data.token);
-        return res.data;
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                email,
+                password
+            }
+        })
+        // if user doesn't exist
+        if (!user) return {message: "Error while logging in ", status: 411};
+
+        let userId = user.id
+        const token = generateToken(userId)
+
+        cookies().set("auth", token);
+        return {
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            description: user.description,
+            status: 200,
+        };
+    } catch (error) {
+        return error;
     }
 }
 
@@ -26,16 +42,53 @@ export async function SignupUser({firstname, lastname, email, password, customUr
     password: string,
     customUrl: string
 }) {
-    const res = await axios.post("http://localhost:3000/api/auth/signup", {
-        firstname,
-        lastname,
-        email,
-        password,
-        customUrl
-    });
-    if (res.status === 200) {
-        cookies().set("auth", res.data.token);
-        return res.data;
+    try {
+        const existingUser = await prisma.user.findUnique({
+            where: {
+                email
+            }
+        })
+        // return if user already exists
+        if (existingUser) return {message: "Email already taken", status: 411};
+
+        // create new user
+        const newUser = await prisma.user.create({
+            data: {
+                firstname,
+                lastname,
+                email,
+                password,
+            }
+        })
+        let userId = newUser.id
+        const token = generateToken(userId)
+
+        const urlExists = await prisma.userSettings.findUnique({
+            where: {
+                customUrl
+            }
+        })
+        if (urlExists) return {message: "Custom Url already taken", status: 411};
+
+        await prisma.userSettings.create({
+            data: {
+                userId: newUser.id,
+                customUrl
+            }
+        })
+
+        cookies().set("auth", token);
+
+        return {
+            message: "User created successfully",
+            firstname: newUser.firstname,
+            lastname: newUser.lastname,
+            email: newUser.email,
+            description: newUser.description,
+            status: 200,
+        };
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -44,67 +97,160 @@ export async function UpdateUser({firstname, lastname, description}: {
     lastname: string,
     description?: string
 }) {
-    const res = await axios.post("http://localhost:3000/api/user/updateUser", {
-        firstname,
-        lastname,
-        description
-    }, {
-        withCredentials: true,
-        headers: {Cookie: cookies().toString()},
-    });
-    if (res.status === 200) {
-        return res.data;
+    try {
+        const token = cookies().get("auth")?.value;
+
+        if (!token) return {message: "Error: token not found", status: 401};
+
+        const userId = parseInt(<string>verifyToken(token));
+        if (!userId) return {message: "Error: Invalid token", status: 401};
+
+        const updatedUser = await prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                firstname,
+                lastname,
+                description
+            }
+        })
+
+        return {
+            message: 'Successfully updated user',
+            updatedUser,
+            status: 200
+        }
+    } catch (error) {
+        console.log(error);
     }
 }
 
 export async function GetUser() {
     try {
-        const res = await axios.get("http://localhost:3000/api/user/getUser", {
-            withCredentials: true,
-            headers: {
-                Cookie: cookies().toString(),
+        const token = cookies().get("auth")?.value;
+
+        if (!token) return {message: "Error: token not found", status: 401};
+
+        const userId = parseInt(<string>verifyToken(token));
+        if (!userId) return {message: "Error: Invalid token", status: 401};
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId,
             },
         });
-        return res.data;
-    } catch (e) {
-        return {error: 'error logging in'}
+
+        return {
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            description: user.description,
+            status: 200
+        }
+    } catch (error) {
+        return {error, status: 500}
     }
 }
 
 export async function GetUserLinks() {
-    const res = await axios.get("http://localhost:3000/api/user/getLinks", {
-        withCredentials: true,
-        headers: {
-            Cookie: cookies().toString(),
-        },
-    })
+    try {
+        const token = cookies().get('auth')?.value;
 
-    return res.data;
+        if (!token) return {message: "Error: token not found", status: 401};
+
+        const userId = parseInt(<string>verifyToken(token));
+        if (!userId) return {message: "Error: Invalid token", status: 401};
+
+        const links = await prisma.link.findMany({
+            where: {
+                userId
+            },
+        });
+
+        if (!links) return {message: "No links found", status: 200};
+
+        return {links};
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 export async function CreateNewLink({title, url, position}: { title: string, url: string, position: number }) {
-    const res = await axios.post("http://localhost:3000/api/link/createLink", {
-        title,
-        url,
-        position
-    }, {
-        withCredentials: true,
-        headers: {
-            Cookie: cookies().toString(),
-        }
-    });
+    try {
+        const token = cookies().get('auth')?.value;
 
-    return res.data;
+        if (!token) return {message: "Error: token not found", status: 401};
+
+        const userId = parseInt(<string>verifyToken(token));
+        if (!userId) return {message: "Error: Invalid token", status: 401};
+
+        const titleExists = await prisma.link.findFirst({
+            where: {
+                title,
+                userId
+            }
+        })
+        if (titleExists) {
+            const newLink = await prisma.link.update({
+                where: {
+                    id: titleExists.id
+                },
+                data: {
+                    title,
+                    url,
+                    position
+                }
+            })
+            return {
+                message: 'Successfully updated link',
+                newLink,
+                status: 200
+            };
+        }
+
+        const newLink = await prisma.link.create({
+            data: {
+                userId,
+                title,
+                url,
+                position
+            }
+        })
+
+        return {
+            message: 'Successfully created new link',
+            newLink,
+            status: 200
+        }
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 export async function DeleteLink(linkId: number) {
-    const res = await axios.delete("http://localhost:3000/api/link/deleteLink", {
-        headers: {Cookie: cookies().toString()},
-        withCredentials: true,
-        data: {linkId},
-    });
+    try {
+        const token = cookies().get('auth')?.value;
 
-    return res.data;
+        if (!token) return {message: "Error: token not found", status: 401};
+
+        const userId = parseInt(<string>verifyToken(token));
+        if (!userId) return {message: "Error: Invalid token", status: 401};
+
+        const deleteLink = await prisma.link.delete({
+            where: {
+                id: linkId,
+            }
+        })
+
+        return {
+            message: 'Successfully deleted link',
+            deleteLink,
+            status: 200
+        };
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 export async function GetLinks(customUrl: string) {
@@ -117,7 +263,7 @@ export async function GetLinks(customUrl: string) {
         }
     }).then(response => response?.userId)
 
-    if (!userId) return {error: "Invalid customUrls"}
+    if (!userId) return {error: "Invalid customUrls", status: 404}
 
     const links = await prisma.link.findMany({
         where: {
@@ -135,7 +281,5 @@ export async function GetLinks(customUrl: string) {
             description: true
         }
     })
-
-    return {links, userDetails};
-
+    return {links, userDetails, status: 200};
 }

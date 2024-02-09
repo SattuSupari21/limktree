@@ -28,6 +28,6 @@ export async function GET(req: NextRequest) {
             }),
         );
     } catch (error) {
-        console.error(error);
+        return new NextResponse(JSON.stringify({error: "An error occurred"}))
     }
 }

@@ -14,7 +14,7 @@ export default function Profile({firstname, lastname, description}: {
             <img
                 className="w-24 h-24 rounded-full"
                 // src="https://d2qp0siotla746.cloudfront.net/img/use-cases/profile-picture/template_3.jpg"
-                src={"/profile.jpg"}
+                src={"/uwu.jpg"}
                 alt="profile-image"
             ></img>
             <div className="flex flex-col text-center mt-4 gap-2">

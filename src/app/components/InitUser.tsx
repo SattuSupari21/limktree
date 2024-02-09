@@ -12,7 +12,7 @@ export function InitUser() {
 
     const init = () => {
         GetUser().then(function (result) {
-            if (result.error) {
+            if (result.status !== 200) {
                 setUser({
                     firstname: null,
                     lastname: null,

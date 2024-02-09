@@ -27,7 +27,7 @@ export default function GeneralInformationCard() {
         setLastName(user.lastname ? user.lastname : "");
         setDescription(user.description ? user.description : "");
     }
-    
+
     function handleUserUpdate() {
         toast.promise(
             // @ts-ignore
@@ -65,10 +65,10 @@ export default function GeneralInformationCard() {
                       placeholder={"Write something about you here..."}
                       onChange={(e) => setDescription(e.target.value)}/>
             <div className="flex gap-2">
-                <Button className="w-full text-md" variant={"flat"} color="secondary"
+                <Button className="w-full text-md" variant={"solid"} color="primary"
                         startContent={<IoMdSave/>} onClick={() => handleUserUpdate()}>
                     Save</Button>
-                <Button className="w-full text-md" variant={"flat"} color="danger"
+                <Button className="w-full text-md" variant={"solid"} color="danger"
                         startContent={<AiOutlineDelete/>} onClick={clearInputs}>
                     Delete</Button>
             </div>
