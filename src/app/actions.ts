@@ -2,6 +2,7 @@
 
 import {cookies} from "next/headers";
 import {prisma} from "../../lib/db";
+import cloudinary from "cloudinary"
 import {generateToken, verifyToken} from "../../utils/auth";
 import {revalidatePath} from "next/cache";
 
@@ -24,14 +25,17 @@ export async function LoginUser({email, password}: {
 
         cookies().set("auth", token);
         return {
-            firstname: user.firstname,
-            lastname: user.lastname,
-            email: user.email,
-            description: user.description,
+            user: {
+                firstname: user.firstname,
+                lastname: user.lastname,
+                email: user.email,
+                description: user.description,
+                profilePicture: user.profilePictureUrl,
+            },
             status: 200,
         };
     } catch (error) {
-        return error;
+        return {error: (error as Error).message}
     }
 }
 
@@ -88,14 +92,15 @@ export async function SignupUser({firstname, lastname, email, password, customUr
             status: 200,
         };
     } catch (error) {
-        console.log(error)
+        return {error: (error as Error).message}
     }
 }
 
-export async function UpdateUser({firstname, lastname, description}: {
+export async function UpdateUser({firstname, lastname, description, profilePicture}: {
     firstname: string,
     lastname: string,
-    description?: string
+    description?: string,
+    profilePicture?: string,
 }) {
     try {
         const token = cookies().get("auth")?.value;
@@ -105,6 +110,23 @@ export async function UpdateUser({firstname, lastname, description}: {
         const userId = parseInt(<string>verifyToken(token));
         if (!userId) return {message: "Error: Invalid token", status: 401};
 
+        cloudinary.v2.config({
+            cloud_name: process.env.CLOUDINARY_NAME,
+            api_key: process.env.CLOUDINARY_KEY,
+            api_secret: process.env.CLOUDINARY_SECRET,
+        })
+
+        let imageUrl = null;
+        if (profilePicture) {
+            await cloudinary.v2.uploader.upload(profilePicture, (error, result) => {
+                if (error) {
+                    console.log(error);
+                }
+            }).then(function (result) {
+                imageUrl = result.secure_url
+            })
+        }
+
         const updatedUser = await prisma.user.update({
             where: {
                 id: userId
@@ -112,7 +134,8 @@ export async function UpdateUser({firstname, lastname, description}: {
             data: {
                 firstname,
                 lastname,
-                description
+                description,
+                profilePictureUrl: imageUrl
             }
         })
 
@@ -122,7 +145,7 @@ export async function UpdateUser({firstname, lastname, description}: {
             status: 200
         }
     } catch (error) {
-        console.log(error);
+        return {error: (error as Error).message};
     }
 }
 
@@ -146,6 +169,7 @@ export async function GetUser() {
             lastname: user.lastname,
             email: user.email,
             description: user.description,
+            profilePicture: user.profilePictureUrl,
             status: 200
         }
     } catch (error) {
@@ -172,7 +196,7 @@ export async function GetUserLinks() {
 
         return {links};
     } catch (error) {
-        console.log(error)
+        return {error: (error as Error).message}
     }
 }
 
@@ -224,7 +248,7 @@ export async function CreateNewLink({title, url, position}: { title: string, url
             status: 200
         }
     } catch (error) {
-        console.log(error);
+        return {error: (error as Error).message};
     }
 }
 
@@ -249,7 +273,7 @@ export async function DeleteLink(linkId: number) {
             status: 200
         };
     } catch (error) {
-        console.log(error);
+        return {error: (error as Error).message};
     }
 }
 
@@ -278,7 +302,8 @@ export async function GetLinks(customUrl: string) {
         select: {
             firstname: true,
             lastname: true,
-            description: true
+            description: true,
+            profilePictureUrl: true,
         }
     })
     return {links, userDetails, status: 200};

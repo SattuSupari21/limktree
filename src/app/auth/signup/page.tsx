@@ -28,7 +28,8 @@ export default function Signup() {
                 firstname: result.firstname,
                 lastname: result.lastname,
                 email: result.email,
-                description: result.description
+                description: result.description,
+                profilePicture: null,
             })
             router.push('/')
         })
