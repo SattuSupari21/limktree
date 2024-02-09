@@ -7,6 +7,7 @@ export const userState = atom({
         firstname: null,
         lastname: null,
         description: null,
-        email: null
+        email: null,
+        profilePicture: null,
     }
 })

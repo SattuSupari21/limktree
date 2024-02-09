@@ -18,6 +18,7 @@ export function InitUser() {
                     lastname: null,
                     email: null,
                     description: null,
+                    profilePicture: null,
                     isLoading: false,
                 });
             } else {
@@ -26,6 +27,7 @@ export function InitUser() {
                     lastname: result.lastname,
                     email: result.email,
                     description: result.description,
+                    profilePicture: result.profilePicture,
                     isLoading: false,
                 });
             }

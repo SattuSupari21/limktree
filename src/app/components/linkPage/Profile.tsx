@@ -1,9 +1,10 @@
 import {SlOptions} from "react-icons/sl";
 
-export default function Profile({firstname, lastname, description}: {
+export default function Profile({firstname, lastname, description, profilePicture}: {
     firstname: string,
     lastname: string,
-    description: string
+    description: string,
+    profilePicture: string,
 }) {
     return (
         <div className="w-full p-4 flex flex-col items-center">
@@ -13,8 +14,7 @@ export default function Profile({firstname, lastname, description}: {
             </div>
             <img
                 className="w-24 h-24 rounded-full"
-                // src="https://d2qp0siotla746.cloudfront.net/img/use-cases/profile-picture/template_3.jpg"
-                src={"/uwu.jpg"}
+                src={profilePicture ? profilePicture : "/profile.jpg"}
                 alt="profile-image"
             ></img>
             <div className="flex flex-col text-center mt-4 gap-2">

@@ -28,7 +28,8 @@ type Link = {
 type User = {
     firstname: string,
     lastname: string,
-    description: string
+    description: string,
+    profilePictureUrl: string,
 }
 
 export default function LinkPage({params}: { params: { customUrl: string } }) {
@@ -58,7 +59,8 @@ export default function LinkPage({params}: { params: { customUrl: string } }) {
 
     if (customUrlValidated && !isLoading) return <div
         className="w-screen h-screen flex flex-col text-white items-center bg-gradient-to-r from-gray-700 via-gray-900 to-black">
-        {user && <Profile firstname={user.firstname} lastname={user.lastname} description={user.description}/>}
+        {user && <Profile firstname={user.firstname} lastname={user.lastname} description={user.description}
+                          profilePicture={user.profilePictureUrl}/>}
         {
             links.map((link: Link) => {
                 return <LinkCards key={link.id} title={link.title}

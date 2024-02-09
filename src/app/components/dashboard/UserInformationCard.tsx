@@ -17,8 +17,7 @@ export default function UserInformationCard() {
                         <Image
                             isBlurred={true}
                             alt="user profile image"
-                            // src="https://d2qp0siotla746.cloudfront.net/img/use-cases/profile-picture/template_3.jpg"
-                            src={"/uwu.jpg"}
+                            src={user.profilePicture ? user.profilePicture : "/profile.jpg"}
                         />
                     </div>
                     <div className="grid place-items-center">

@@ -12,6 +12,7 @@
     "@nextui-org/react": "^2.2.9",
     "@prisma/client": "^5.9.0",
     "axios": "^1.6.7",
+    "cloudinary": "^2.0.1",
     "cookie": "^0.6.0",
     "framer-motion": "^11.0.3",
     "jsonwebtoken": "^9.0.2",

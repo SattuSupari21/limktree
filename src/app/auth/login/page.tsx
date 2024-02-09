@@ -12,6 +12,20 @@ import {IoMdArrowBack} from "react-icons/io";
 import {useSetRecoilState} from "recoil";
 import {userState} from "@/store/atoms/user";
 
+type User = {
+    firstname: string,
+    lastname: string,
+    email: string,
+    description: string,
+};
+
+type UserLoginResponse = {
+    user: User,
+    status: number,
+    message: string,
+}
+
+
 export default function Login() {
     const router = useRouter();
     const [email, setEmail] = useState("")
@@ -20,14 +34,19 @@ export default function Login() {
 
     function handleUserLogin() {
         LoginUser({email, password}).then(function (result) {
-            setUser({
-                isLoading: false,
-                firstname: result.firstname,
-                lastname: result.lastname,
-                email: result.email,
-                description: result.description
-            })
-            router.push('/')
+            if (result.user) {
+                setUser({
+                    isLoading: false,
+                    firstname: result.user.firstname,
+                    lastname: result.user.lastname,
+                    email: result.user.email,
+                    description: result.user.description,
+                    profilePicture: result.user.profilePicture,
+                })
+                router.push('/')
+            } else {
+                console.log(result.message);
+            }
         })
     }
 
