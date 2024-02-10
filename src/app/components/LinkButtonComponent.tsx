@@ -28,11 +28,6 @@ type Link = {
     position: number
 }
 
-interface LinkUpdate {
-    id: number,
-    position: number
-}
-
 export default function LinkButtonComponent() {
     const [linksLoading, setLinksLoading] = useRecoilState(linkState);
     const [links, setLinks] = useState<Link[]>([]);
@@ -117,30 +112,39 @@ export default function LinkButtonComponent() {
     function UserLinksComponent({button, value}: { button: LinkButton, value?: string }) {
         let Icon: IconType = button.icon as (props: IconBaseProps) => JSX.Element;
         return (
-            <div className="grid grid-cols-4 place-items-center gap-6 mb-2" key={button.key}>
-                <div className="flex gap-2 justify-center items-center mr-auto">
-                    <MdDragIndicator className="cursor-grab"/>
-                    <Icon/>
-                    <p>{button.label}</p>
-                </div>
-                <div className="flex justify-center items-center col-span-3 w-full gap-2">
-                    <Input variant={'underlined'} type={"text"} placeholder={"URL"} defaultValue={value} size={'sm'}
-                           ref={inputRef}/>
-                    <Button isIconOnly color="success" variant="faded" aria-label="save link"
-                            onClick={() => {
-                                handleNewLink(button)
-                            }}>
-                        <IoMdSave/>
-                    </Button>
-                    <Button isIconOnly color="danger" variant="faded" aria-label="delete link"
-                            onClick={() => {
-                                handleDeleteLink(button)
-                            }}>
-                        <AiOutlineDelete/>
-                    </Button>
-                    <Toaster/>
+            <div className="flex gap-2 items-center mb-2">
+                <MdDragIndicator className="cursor-grab"/>
+                <div className="flex-1 grid grid-cols-4 place-items-center gap-6" key={button.key}
+                     draggable={true}
+                     onDragStart={(e) => {
+                         e.preventDefault()
+                         e.stopPropagation()
+                     }}>
+                    <div className="flex gap-2 justify-center items-center mr-auto">
+
+                        <Icon/>
+                        <p>{button.label}</p>
+                    </div>
+                    <div className="flex justify-center items-center col-span-3 w-full gap-2">
+                        <Input variant={'underlined'} type={"text"} placeholder={"URL"} defaultValue={value} size={'sm'}
+                               ref={inputRef}/>
+                        <Button isIconOnly color="success" variant="faded" aria-label="save link"
+                                onClick={() => {
+                                    handleNewLink(button)
+                                }}>
+                            <IoMdSave/>
+                        </Button>
+                        <Button isIconOnly color="danger" variant="faded" aria-label="delete link"
+                                onClick={() => {
+                                    handleDeleteLink(button)
+                                }}>
+                            <AiOutlineDelete/>
+                        </Button>
+                        <Toaster/>
+                    </div>
                 </div>
             </div>
+
         )
     }
 
@@ -180,8 +184,9 @@ export default function LinkButtonComponent() {
                         onDragEnter={() => dragOverLink.current = index}
                         onDragEnd={handleSort}
                         onDragOver={(e) => e.preventDefault()}
-                    ><UserLinksComponent key={button.key} button={button}
-                                         value={link.url}/>
+                    >
+                        <UserLinksComponent key={button.key} button={button}
+                                            value={link.url}/>
                     </div>
                 })}
             </div>
