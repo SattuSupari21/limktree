@@ -25,7 +25,7 @@ const ProtectedRoute = ({children}: { children: React.JSX.Element }) => {
     }, []);
 
     if (!userEmail && !isUserLoading) {
-        router.push('/auth/login');
+        router.push('/');
     }
 
     if (isUserLoading) return <CircularProgress color="default" aria-label="Loading..." size={'lg'}/>

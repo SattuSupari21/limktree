@@ -166,7 +166,7 @@ export default function LinkButtonComponent() {
 
         setLinks(linksClone)
 
-        UpdateLinksPosition({firstId, firstPosition, secondId, secondPosition}).then(r => r.status);
+        UpdateLinksPosition({firstId, firstPosition, secondId, secondPosition}).then(r => setLinks(r.links));
     }
 
     return (

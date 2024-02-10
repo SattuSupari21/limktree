@@ -11,16 +11,23 @@ import {
     NavbarMenuToggle,
     NavbarMenu,
     NavbarMenuItem,
-    Skeleton,
+    Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, User,
 } from "@nextui-org/react";
-import {useRecoilValue} from "recoil";
+import {useRecoilState, useRecoilValue} from "recoil";
 import {userEmailState} from "@/store/selectors/userEmail";
 import {isUserLoading} from "@/store/selectors/isUserLoading";
 import {ThemeSwitcher} from "@/app/components/ThemeSwitcher";
+import {userState} from "@/store/atoms/user";
+import {LogoutUser} from "@/app/actions";
+import {useRouter} from "next/navigation";
+import {InitUser} from "@/app/components/InitUser";
+import {revalidatePath} from "next/cache";
 
 export default function Header() {
+    const router = useRouter();
     const menuItems = ["Features", "About", "Login"];
 
+    const [user, setUser] = useRecoilState(userState);
     const userEmail = useRecoilValue(userEmailState);
     const userLoading = useRecoilValue(isUserLoading);
 
@@ -54,21 +61,43 @@ export default function Header() {
         );
     }
 
+    async function handleLogout() {
+        await LogoutUser();
+        router.push('/');
+        setUser({
+            firstname: null,
+            lastname: null,
+            email: null,
+            description: null,
+            profilePicture: null,
+            isLoading: false,
+        });
+    }
+
     function RenderUserAccount() {
         return (
             <NavbarContent justify="end">
-                <NavbarItem className="hidden lg:flex">
-                    <Button
-                        as={Link}
-                        color="success"
-                        href="/dashboard"
-                        variant="bordered"
-                    >
-                        Dashboard
-                    </Button>
+                <NavbarItem>
+                    <Dropdown>
+                        <DropdownTrigger>
+                            <img
+                                className="w-10 h-10 rounded-full cursor-pointer"
+                                src={user.profilePicture ? user.profilePicture : "/profile.jpg"}
+                                alt="profile-image"
+                            ></img>
+                        </DropdownTrigger>
+                        <DropdownMenu aria-label="Static Actions">
+                            <DropdownItem key="dashboard"><Link href={'/dashboard'}
+                                                                color={'foreground'}>Dashboard</Link></DropdownItem>
+                            <DropdownItem key="delete" className="text-danger" color="danger"
+                                          onClick={handleLogout}>
+                                Log out
+                            </DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
                 </NavbarItem>
             </NavbarContent>
-        );
+        )
     }
 
     return (

@@ -6,5 +6,5 @@ export const isUserLoading = selector({
     get: ({get}) => {
         const state = get(userState);
         return state.isLoading;
-    }
+    },
 })
