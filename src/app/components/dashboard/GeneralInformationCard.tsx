@@ -12,6 +12,7 @@ import {UpdateUser} from "@/app/actions";
 import {userDetailState} from "@/store/selectors/userDetails";
 import {isUserLoading} from "@/store/selectors/isUserLoading";
 import {MdOutlineCloudUpload} from "react-icons/md";
+import {UserUpdateBodySchema} from "../../../../lib/types";
 
 export default function GeneralInformationCard() {
 
@@ -61,9 +62,26 @@ export default function GeneralInformationCard() {
                 setBase64(fileReader.result as string);
             };
         }
+        // client side validation
+        const newUser = {firstname, lastname, description, base64}
+        const result = UserUpdateBodySchema.safeParse(newUser);
+        if (!result.success) {
+            const allErrors = result.error.issues;
+            let errors = "";
+            allErrors.map((error) => {
+                errors = errors + error.message + "\n";
+            })
+            toast.error(errors);
+            return;
+        }
         toast.promise(
             // @ts-ignore
-            UpdateUser({firstname, lastname, description, profilePicture: base64}).then(function (result) {
+            UpdateUser({
+                firstname,
+                lastname,
+                description,
+                profilePicture: base64 ? base64 : user.profilePicture ? user.profilePicture : ""
+            }).then(function (result) {
                 if (result.updatedUser) {
                     setUser({
                         firstname: result.updatedUser.firstname,

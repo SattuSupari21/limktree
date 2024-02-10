@@ -11,6 +11,8 @@ import {useRouter} from "next/navigation";
 import {LoginUser, SignupUser} from "@/app/actions";
 import {useSetRecoilState} from "recoil";
 import {userState} from "@/store/atoms/user";
+import {SignupBodySchema} from "../../../../lib/types";
+import toast, {Toaster} from "react-hot-toast";
 
 export default function Signup() {
     const router = useRouter();
@@ -22,16 +24,33 @@ export default function Signup() {
     const [customUrl, setCustomUrl] = useState("")
 
     function handleUserSignup() {
-        SignupUser({firstname, lastname, email, password, customUrl}).then(function (result) {
-            setUser({
-                isLoading: false,
-                firstname: result.firstname,
-                lastname: result.lastname,
-                email: result.email,
-                description: result.description,
-                profilePicture: null,
+        // client side validation
+        const newUser = {firstname, lastname, email, password, customUrl}
+        const result = SignupBodySchema.safeParse(newUser);
+        if (!result.success) {
+            const allErrors = result.error.issues;
+            let errors = "";
+            allErrors.map((error) => {
+                errors = errors + error.message + "\n";
             })
-            router.push('/')
+            toast.error(errors);
+            return;
+        }
+
+        SignupUser({firstname, lastname, email, password, customUrl}).then(function (result) {
+            if (result.user) {
+                setUser({
+                    isLoading: false,
+                    firstname: result.user.firstname,
+                    lastname: result.user.lastname,
+                    email: result.user.email,
+                    description: result.user.description,
+                    profilePicture: null,
+                })
+                router.push('/')
+            } else {
+                console.log(result.message)
+            }
         })
     }
 
@@ -61,6 +80,10 @@ export default function Signup() {
                     <BottomWarning label={"Already have an account?"} linkLabel={"Log In"} link={"/auth/login"}/>
                 </CardFooter>
             </Card>
+            <Toaster
+                position="top-right"
+                reverseOrder={false}
+            />
         </div>
     );
 }

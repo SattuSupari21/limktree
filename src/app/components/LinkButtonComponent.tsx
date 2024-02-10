@@ -13,6 +13,7 @@ import {useRecoilState} from "recoil";
 import {linkState} from "@/store/atoms/links";
 import toast, {Toaster} from "react-hot-toast";
 import {MdDragIndicator} from "react-icons/md";
+import {LinkButtonSchema} from "../../../lib/types";
 
 type LinkButton = {
     key: string,
@@ -64,6 +65,21 @@ export default function LinkButtonComponent() {
         const title = button.label
         const position = links.length + 1;
         if (!inputRef.current) return
+        // @ts-ignore
+        const url = inputRef.current.value;
+
+        // client side validation
+        const newLink = {title, url, position}
+        const result = LinkButtonSchema.safeParse(newLink);
+        if (!result.success) {
+            const allErrors = result.error.issues;
+            let errors = "";
+            allErrors.map((error) => {
+                errors = errors + error.message + "\n";
+            })
+            toast.error(errors);
+            return;
+        }
 
         toast.promise(
             // @ts-ignore
