@@ -39,6 +39,11 @@ export async function LoginUser({email, password}: {
     }
 }
 
+export async function LogoutUser() {
+    cookies().delete("auth");
+    revalidatePath('/');
+}
+
 export async function SignupUser({firstname, lastname, email, password, customUrl}: {
     firstname: string,
     lastname: string,
@@ -295,6 +300,9 @@ export async function GetLinks(customUrl: string) {
     const links = await prisma.link.findMany({
         where: {
             userId
+        },
+        orderBy: {
+            position: 'asc'
         }
     })
 
@@ -335,12 +343,57 @@ export async function UpdateLinksPosition({firstId, firstPosition, secondId, sec
                 position: firstPosition
             }
         })
+        const token = cookies().get('auth')?.value;
+
+        if (!token) return {message: "Error: token not found", status: 401};
+
+        const userId = parseInt(<string>verifyToken(token));
+        const links = await prisma.link.findMany({
+            where: {
+                userId
+            },
+            orderBy: {
+                position: 'asc'
+            }
+        })
         revalidatePath('/dashboard')
         return {
             message: 'Successfully updated user',
+            links,
             status: 200
         }
 
+    } catch (error) {
+        return {error: (error as Error).message};
+    }
+}
+
+export async function GetUserCustomUrl() {
+    try {
+        const token = cookies().get('auth')?.value;
+
+        if (!token) return {message: "Error: token not found", status: 401};
+
+        const userId = parseInt(<string>verifyToken(token));
+        if (!userId) return {message: "Error: Invalid token", status: 401};
+
+        const customUrl = await prisma.userSettings.findUnique({
+            where: {
+                userId
+            },
+            select: {
+                customUrl: true
+            }
+        })
+        if (customUrl) {
+            return {
+                message: 'Successfully updated user',
+                customUrl,
+                status: 200
+            }
+        }
+
+        return {status: 200}
     } catch (error) {
         return {error: (error as Error).message};
     }

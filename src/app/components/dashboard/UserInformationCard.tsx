@@ -1,11 +1,17 @@
 import {Card, CardBody, Image, Link} from "@nextui-org/react";
 import {FaLink} from "react-icons/fa6";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {useRecoilValue} from "recoil";
 import {userState} from "@/store/atoms/user";
+import {GetUserCustomUrl} from "@/app/actions";
 
 export default function UserInformationCard() {
     const user = useRecoilValue(userState);
+    const [customUrl, setCustomUrl] = useState<string>();
+
+    useEffect(() => {
+        GetUserCustomUrl().then(res => setCustomUrl(res.customUrl.customUrl))
+    }, []);
 
     return <div>
         <p className="text-4xl font-bold mb-4">User Dashboard</p>
@@ -22,8 +28,8 @@ export default function UserInformationCard() {
                     </div>
                     <div className="grid place-items-center">
                         <p className="text-xl font-semibold">{user.firstname} {user.lastname}</p>
-                        <Link href="/samtu" className="text-white" isExternal={true}><FaLink
-                            className="mr-1"/>limktree.com/samtu</Link>
+                        <Link href={'/' + customUrl} className="text-white" isExternal={true}><FaLink
+                            className="mr-1"/>limktree.com/{customUrl}</Link>
                     </div>
                 </div>
             </CardBody>
