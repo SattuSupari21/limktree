@@ -12,6 +12,9 @@ import {IoMdArrowBack} from "react-icons/io";
 import {useSetRecoilState} from "recoil";
 import {userState} from "@/store/atoms/user";
 
+import {LoginBodySchema} from "@/../lib/types";
+import toast, {Toaster} from "react-hot-toast";
+
 type User = {
     firstname: string,
     lastname: string,
@@ -33,6 +36,19 @@ export default function Login() {
     const setUser = useSetRecoilState(userState);
 
     function handleUserLogin() {
+        // client side validation
+        const newUser = {email, password}
+        const result = LoginBodySchema.safeParse(newUser);
+        if (!result.success) {
+            const allErrors = result.error.issues;
+            let errors = "";
+            allErrors.map((error) => {
+                errors = errors + error.message + "\n";
+            })
+            toast.error(errors);
+            return;
+        }
+
         LoginUser({email, password}).then(function (result) {
             if (result.user) {
                 setUser({
@@ -45,7 +61,7 @@ export default function Login() {
                 })
                 router.push('/')
             } else {
-                console.log(result.message);
+                toast.error(result.error);
             }
         })
     }
@@ -70,6 +86,10 @@ export default function Login() {
                     <BottomWarning label={"Don't have an account?"} linkLabel={"Sign Up"} link={"/auth/signup"}/>
                 </CardFooter>
             </Card>
+            <Toaster
+                position="top-right"
+                reverseOrder={false}
+            />
         </div>
     );
 }

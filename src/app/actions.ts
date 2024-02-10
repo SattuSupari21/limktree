@@ -5,11 +5,23 @@ import {prisma} from "../../lib/db";
 import cloudinary from "cloudinary"
 import {generateToken, verifyToken} from "../../utils/auth";
 import {revalidatePath} from "next/cache";
+import {LinkButtonSchema, LoginBodySchema, SignupBodySchema, UserUpdateBodySchema} from "../../lib/types";
 
 export async function LoginUser({email, password}: {
     email: string;
     password: string;
 }) {
+    // server side validation
+    const newUser = {email, password}
+    const result = LoginBodySchema.safeParse(newUser);
+    if (!result.success) {
+        const allErrors = result.error.issues;
+        let errorMessages = "";
+        allErrors.map((error) => {
+            errorMessages = errorMessages + error.message + "\n";
+        })
+        return {error: errorMessages}
+    }
     try {
         const user = await prisma.user.findUnique({
             where: {
@@ -18,7 +30,7 @@ export async function LoginUser({email, password}: {
             }
         })
         // if user doesn't exist
-        if (!user) return {message: "Error while logging in ", status: 411};
+        if (!user) return {error: "Invalid email or password!", status: 411};
 
         let userId = user.id
         const token = generateToken(userId)
@@ -51,6 +63,17 @@ export async function SignupUser({firstname, lastname, email, password, customUr
     password: string,
     customUrl: string
 }) {
+    // server side validation
+    const newUser = {firstname, lastname, email, password, customUrl}
+    const result = SignupBodySchema.safeParse(newUser);
+    if (!result.success) {
+        const allErrors = result.error.issues;
+        let errorMessages = "";
+        allErrors.map((error) => {
+            errorMessages = errorMessages + error.message + "\n";
+        })
+        return {error: errorMessages};
+    }
     try {
         const existingUser = await prisma.user.findUnique({
             where: {
@@ -90,10 +113,12 @@ export async function SignupUser({firstname, lastname, email, password, customUr
 
         return {
             message: "User created successfully",
-            firstname: newUser.firstname,
-            lastname: newUser.lastname,
-            email: newUser.email,
-            description: newUser.description,
+            user: {
+                firstname: newUser.firstname,
+                lastname: newUser.lastname,
+                email: newUser.email,
+                description: newUser.description,
+            },
             status: 200,
         };
     } catch (error) {
@@ -107,6 +132,17 @@ export async function UpdateUser({firstname, lastname, description, profilePictu
     description?: string,
     profilePicture?: string,
 }) {
+    // server side validation
+    const newUser = {firstname, lastname, description, profilePicture}
+    const result = UserUpdateBodySchema.safeParse(newUser);
+    if (!result.success) {
+        const allErrors = result.error.issues;
+        let errorMessages = "";
+        allErrors.map((error) => {
+            errorMessages = errorMessages + error.message + "\n";
+        })
+        return {error: errorMessages};
+    }
     try {
         const token = cookies().get("auth")?.value;
 
@@ -209,6 +245,18 @@ export async function GetUserLinks() {
 }
 
 export async function CreateNewLink({title, url, position}: { title: string, url: string, position: number }) {
+    // server side validation
+    const newLink = {title, url, position}
+    const result = LinkButtonSchema.safeParse(newLink);
+    if (!result.success) {
+        const allErrors = result.error.issues;
+        let errorMessages = "";
+        allErrors.map((error) => {
+            errorMessages = errorMessages + error.message + "\n";
+        })
+        return {error: errorMessages};
+    }
+
     try {
         const token = cookies().get('auth')?.value;
 
