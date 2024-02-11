@@ -365,7 +365,17 @@ export async function GetLinks(customUrl: string) {
             profilePictureUrl: true,
         }
     })
-    return {links, userDetails, status: 200};
+
+    const userSettings = await prisma.userSettings.findUnique({
+        where: {
+            userId
+        },
+        select: {
+            backgroundColor: true,
+        }
+    })
+
+    return {links, userDetails, userSettings, status: 200};
 }
 
 export async function UpdateLinksPosition({firstId, firstPosition, secondId, secondPosition}: {
@@ -430,7 +440,8 @@ export async function GetUserCustomUrl() {
                 userId
             },
             select: {
-                customUrl: true
+                customUrl: true,
+                backgroundColor: true,
             }
         })
         if (customUrl) {
@@ -442,6 +453,31 @@ export async function GetUserCustomUrl() {
         }
 
         return {status: 200}
+    } catch (error) {
+        return {error: (error as Error).message};
+    }
+}
+
+export async function UpdateBackgroundColor(backgroundColor: string | null) {
+    try {
+        const token = cookies().get('auth')?.value;
+
+        if (!token) return {message: "Error: token not found", status: 401};
+
+        const userId = parseInt(<string>verifyToken(token));
+        if (!userId) return {message: "Error: Invalid token", status: 401};
+
+        if (backgroundColor) {
+            const updatedBackgroundColor = await prisma.userSettings.update({
+                where: {
+                    userId
+                },
+                data: {
+                    backgroundColor
+                }
+            })
+            return {status: 200}
+        } else throw new Error;
     } catch (error) {
         return {error: (error as Error).message};
     }

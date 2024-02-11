@@ -39,6 +39,7 @@ export default function LinkPage({params}: { params: { customUrl: string } }) {
     const [user, setUser] = useState<User>();
     const [customUrlValidated, setCustomUrlValidated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [background, setBackground] = useState<string>();
 
     useEffect(() => {
         GetLinks(customUrl).then(function (result) {
@@ -49,6 +50,7 @@ export default function LinkPage({params}: { params: { customUrl: string } }) {
             }
             setLinks(result.links);
             setUser(result.userDetails);
+            setBackground(result.userSettings.backgroundColor);
             setIsLoading(false);
             setCustomUrlValidated(true);
         })
@@ -58,7 +60,7 @@ export default function LinkPage({params}: { params: { customUrl: string } }) {
         label="Loading limktree..." color="secondary"/></div>
 
     if (customUrlValidated && !isLoading) return <div
-        className="w-screen h-screen flex flex-col text-white items-center bg-gradient-to-r from-gray-700 via-gray-900 to-black">
+        className={`w-screen h-screen flex flex-col items-center ${background} ? ${background} : bg-blue-400`}>
         {user && <Profile firstname={user.firstname} lastname={user.lastname} description={user.description}
                           profilePicture={user.profilePictureUrl}/>}
         {
