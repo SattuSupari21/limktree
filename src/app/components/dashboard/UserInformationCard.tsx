@@ -22,6 +22,7 @@ export default function UserInformationCard() {
     const user = useRecoilValue(userState);
     const [userSettings, setUserSettings] = useState<UserSettings>();
     const [background, setBackground] = useState<string | null>("bg-blue-400");
+    const [backgroundType, setBackgroundType] = useState<string>();
 
     useEffect(() => {
         GetUserCustomUrl().then(res => setUserSettings({
@@ -32,6 +33,7 @@ export default function UserInformationCard() {
 
     useEffect(() => {
         if (userSettings?.backgroundColor) setBackground(userSettings.backgroundColor)
+        setBackgroundType(backgrounds.find(bg => bg.bg === userSettings?.backgroundColor)?.type);
     }, [userSettings?.backgroundColor]);
 
     function handleBackgroundColorUpdate(bg: string) {
@@ -46,6 +48,7 @@ export default function UserInformationCard() {
                         <CardBody className={` p-0 w-32 h-32 ${item.bg}`}
                                   onClick={() => {
                                       setBackground(item.bg);
+                                      setBackgroundType(item.type);
                                       handleBackgroundColorUpdate(item.bg)
                                   }}/>
                     </Card>
@@ -71,6 +74,8 @@ export default function UserInformationCard() {
         )
     }
 
+    const text = backgroundType === "dark" ? "text-white" : "text-black";
+
     return <div>
         <p className="text-4xl font-bold mb-4">User Dashboard</p>
         <Card>
@@ -90,8 +95,8 @@ export default function UserInformationCard() {
                             />
                         </div>
                         <div className="grid place-items-center">
-                            <p className="text-xl font-semibold">{user.firstname} {user.lastname}</p>
-                            <Link href={'/' + userSettings?.customUrl} className="text-white" isExternal={true}><FaLink
+                            <p className={`text-xl font-semibold ${text}`}>{user.firstname} {user.lastname}</p>
+                            <Link href={'/' + userSettings?.customUrl} className={text} isExternal={true}><FaLink
                                 className="mr-1"/>limktree.com/{userSettings?.customUrl}</Link>
                         </div>
                     </div>

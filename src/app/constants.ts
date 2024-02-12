@@ -49,14 +49,14 @@ export const buttons = [
 ]
 
 export const backgrounds = [
-    {id: 1, bg: "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500"},
-    {id: 2, bg: "bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"},
-    {id: 3, bg: "bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400"},
-    {id: 4, bg: "bg-gradient-to-r from-green-200 via-green-400 to-purple-700"},
-    {id: 5, bg: "bg-gradient-to-r from-red-200 via-red-300 to-yellow-200"},
-    {id: 6, bg: "bg-gradient-to-r from-teal-200 to-lime-200"},
+    {id: 1, bg: "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500", type: "light"},
+    {id: 2, bg: "bg-gradient-to-r from-green-300 via-blue-500 to-purple-600", type: "light"},
+    {id: 3, bg: "bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400", type: "light"},
+    {id: 4, bg: "bg-gradient-to-r from-green-200 via-green-400 to-purple-700", type: "light"},
+    {id: 5, bg: "bg-gradient-to-r from-red-200 via-red-300 to-yellow-200", type: "light"},
+    {id: 6, bg: "bg-gradient-to-r from-teal-200 to-lime-200", type: "light"},
 
-    {id: 7, bg: "bg-gradient-to-r from-gray-700 via-gray-900 to-black"},
-    {id: 8, bg: "bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600"},
-    {id: 9, bg: "bg-gradient-to-b from-gray-900 to-gray-600 bg-gradient-to-r"},
+    {id: 7, bg: "bg-gradient-to-r from-gray-700 via-gray-900 to-black", type: "dark"},
+    {id: 8, bg: "bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600", type: "dark"},
+    {id: 9, bg: "bg-gradient-to-b from-gray-900 to-gray-600 bg-gradient-to-r", type: "dark"},
 ]
