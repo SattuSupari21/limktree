@@ -7,7 +7,7 @@ export default function Profile({firstname, lastname, description, profilePictur
     profilePicture: string,
 }) {
     return (
-        <div className="w-full p-4 flex flex-col items-center">
+        <div className="w-2/3 md:w-1/2 lg:w-1/3 h-auto mt-2 mb-4 flex flex-col items-center">
             <div
                 className="flex justify-center items-center bg-white border border-white rounded-full w-8 h-8 cursor-pointer ml-auto">
                 <SlOptions className="text-black w-3"/>
