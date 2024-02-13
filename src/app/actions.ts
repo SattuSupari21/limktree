@@ -214,7 +214,7 @@ export async function GetUser() {
             status: 200
         }
     } catch (error) {
-        return {error, status: 500}
+        return {error: (error as Error).message};
     }
 }
 

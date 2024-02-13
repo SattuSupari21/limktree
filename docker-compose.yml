@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  nextjs:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/limktreeDB
+      - CLOUDINARY_NAME=dpnmetc7y
+      - CLOUDINARY_KEY=647436866718465
+      - CLOUDINARY_SECRET=OreMTmbZJ725hMNOPwYJ2PUGWkk
+    depends_on:
+      - "db"
+
+  db:
+    container_name: "db"
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: limktreeDB
