@@ -24,11 +24,13 @@ export const UserUpdateBodySchema = z.object({
     profilePicture: z.string().optional()
 })
 
-export const LinkButtonSchema = z.object({
-    title: z.string(),
-    url: z.string().url({message: "Invalid URL!"}),
-    position: z.number()
-})
+export const LinkButtonSchema = z.array(
+    z.object({
+        title: z.string(),
+        url: z.string().url({message: "Invalid URL!"}),
+        position: z.number()
+    })
+)
 
 export type LoginSchema = z.infer<typeof LoginBodySchema>;
 export type SignupSchema = z.infer<typeof SignupBodySchema>;

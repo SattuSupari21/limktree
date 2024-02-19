@@ -11,7 +11,7 @@ import {
     NavbarMenuToggle,
     NavbarMenu,
     NavbarMenuItem,
-    Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, User,
+    Skeleton, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
 } from "@nextui-org/react";
 import {useRecoilState, useRecoilValue} from "recoil";
 import {userEmailState} from "@/store/selectors/userEmail";
@@ -22,6 +22,7 @@ import {LogoutUser} from "@/app/actions";
 import {useRouter} from "next/navigation";
 import {InitUser} from "@/app/components/InitUser";
 import {revalidatePath} from "next/cache";
+import {profileUser} from "@/app/constants";
 
 export default function Header() {
     const router = useRouter();
@@ -81,8 +82,8 @@ export default function Header() {
                     <Dropdown>
                         <DropdownTrigger>
                             <img
-                                className="w-10 h-10 rounded-full cursor-pointer"
-                                src={user.profilePicture ? user.profilePicture : "/profile.jpg"}
+                                className="w-10 h-10 rounded-full bg-white cursor-pointer"
+                                src={user.profilePicture ?? profileUser}
                                 alt="profile-image"
                             ></img>
                         </DropdownTrigger>

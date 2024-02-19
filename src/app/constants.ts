@@ -60,3 +60,5 @@ export const backgrounds = [
     {id: 8, bg: "bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600", type: "dark"},
     {id: 9, bg: "bg-gradient-to-b from-gray-900 to-gray-600 bg-gradient-to-r", type: "dark"},
 ]
+
+export const profileUser = './user.png'

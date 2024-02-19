@@ -1,4 +1,5 @@
 import {SlOptions} from "react-icons/sl";
+import {profileUser} from "@/app/constants";
 
 export default function Profile({firstname, lastname, description, profilePicture}: {
     firstname: string,
@@ -14,7 +15,7 @@ export default function Profile({firstname, lastname, description, profilePictur
             </div>
             <img
                 className="w-24 h-24 rounded-full"
-                src={profilePicture ? profilePicture : "/profile.jpg"}
+                src={profilePicture ? profilePicture : profileUser}
                 alt="profile-image"
             ></img>
             <div className="flex flex-col text-center mt-4 gap-2">

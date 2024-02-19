@@ -244,10 +244,15 @@ export async function GetUserLinks() {
     }
 }
 
-export async function CreateNewLink({title, url, position}: { title: string, url: string, position: number }) {
+type NewLinkType = {
+    title: string,
+    url: string,
+    position: number,
+}
+
+export async function CreateNewLink(linkArray: NewLinkType[]) {
     // server side validation
-    const newLink = {title, url, position}
-    const result = LinkButtonSchema.safeParse(newLink);
+    const result = LinkButtonSchema.safeParse(linkArray);
     if (!result.success) {
         const allErrors = result.error.issues;
         let errorMessages = "";
@@ -265,42 +270,46 @@ export async function CreateNewLink({title, url, position}: { title: string, url
         const userId = parseInt(<string>verifyToken(token));
         if (!userId) return {message: "Error: Invalid token", status: 401};
 
-        const titleExists = await prisma.link.findFirst({
-            where: {
-                title,
-                userId
-            }
-        })
-        if (titleExists) {
-            const newLink = await prisma.link.update({
+        linkArray.map(async (link) => {
+            const {title, url, position} = link;
+
+            // check if link already exists
+            const titleExists = await prisma.link.findFirst({
                 where: {
-                    id: titleExists.id
-                },
+                    title,
+                    userId
+                }
+            })
+            if (titleExists) {
+                const newLink = await prisma.link.update({
+                    where: {
+                        id: titleExists.id
+                    },
+                    data: {
+                        title,
+                        url,
+                        position
+                    }
+                })
+                return {
+                    message: 'Successfully updated link',
+                    newLink,
+                    status: 200
+                };
+            }
+
+            // create new link
+            const newLink = await prisma.link.create({
                 data: {
+                    userId,
                     title,
                     url,
                     position
                 }
             })
-            return {
-                message: 'Successfully updated link',
-                newLink,
-                status: 200
-            };
-        }
-
-        const newLink = await prisma.link.create({
-            data: {
-                userId,
-                title,
-                url,
-                position
-            }
         })
-
         return {
             message: 'Successfully created new link',
-            newLink,
             status: 200
         }
     } catch (error) {

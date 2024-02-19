@@ -32,11 +32,17 @@ type Link = {
 export default function LinkButtonComponent() {
     const [linksLoading, setLinksLoading] = useRecoilState(linkState);
     const [links, setLinks] = useState<Link[]>([]);
-    const inputRef = useRef(null);
     const dragLink = useRef<number>(0);
     const dragOverLink = useRef<number>(0);
     const [activeButtons, setActiveButtons] = useState([]);
     const [availableButtons, setAvailableButtons] = useState(buttons.filter(b => !activeButtons.find((btn: LinkButton) => btn.key === b.key)));
+
+    type LinkInputFieldType = {
+        title: string,
+        url: string
+    }
+
+    const [inputFields, setInputFields] = useState<LinkInputFieldType[]>([]);
 
     useEffect(() => {
         GetUserLinks().then(function (result) {
@@ -48,34 +54,55 @@ export default function LinkButtonComponent() {
     useMemo(() => {
         // @ts-ignore
         setActiveButtons(buttons.filter((b: LinkButton) => links.find((l: Link) => l.title === b.label)))
+        let counter = 0;
+        let newInputFields: LinkInputFieldType[] = []
+        links.map((link) => {
+            newInputFields.push({title: link.title, url: link.url});
+            counter = counter + 1;
+        })
+        setInputFields(newInputFields);
     }, [links])
 
     useMemo(() => {
         setAvailableButtons(buttons.filter(b => !activeButtons.find((btn: LinkButton) => btn.key === b.key)))
     }, [activeButtons]);
 
+
     function addButton(button: LinkButton) {
         // @ts-ignore
         setActiveButtons((prev) => {
             return [...prev, button];
         });
+        const newInputFields = [...inputFields];
+        newInputFields.push({
+            title: button.label,
+            url: ''
+        });
+        setInputFields(newInputFields);
     }
 
-    function handleNewLink(button: LinkButton) {
-        const title = button.label
-        const position = links.length + 1;
-        if (!inputRef.current) return
-        // @ts-ignore
-        const url = inputRef.current.value;
+    function handleNewLink() {
+        interface NewLinkType extends LinkInputFieldType {
+            position: number
+        }
 
-        // client side validation
-        const newLink = {title, url, position}
-        const result = LinkButtonSchema.safeParse(newLink);
+        let linkArray: NewLinkType[] = [];
+        let counter = 0;
+
+        inputFields.map((input) => {
+            const title = input.title;
+            const url = input.url;
+            const position = ++counter;
+            const newLink: NewLinkType = {title, url, position}
+            linkArray.push(newLink)
+        })
+
+        const result = LinkButtonSchema.safeParse(linkArray);
         if (!result.success) {
             const allErrors = result.error.issues;
             let errors = "";
             allErrors.map((error) => {
-                errors = errors + error.message + "\n";
+                errors = error.message;
             })
             toast.error(errors);
             return;
@@ -83,27 +110,36 @@ export default function LinkButtonComponent() {
 
         toast.promise(
             // @ts-ignore
-            CreateNewLink({title, url: inputRef.current.value, position}).then(function (result) {
-                if (result.newLink) {
+            CreateNewLink(linkArray).then(function (result) {
+                if (result.status === 200) {
                     GetUserLinks().then(function (result) {
                         setLinks(result.links);
                     })
+                } else {
+                    console.log(result.error)
                 }
             }),
             {
                 loading: 'Saving...',
-                success: <b>Link created successfully!</b>,
+                success: <b>Saved successfully!</b>,
                 error: <b>Could not save.</b>,
             }
         ).then(() => {
-            return
+            let newInputFields: LinkInputFieldType[] = []
+            links.map((link) => {
+                newInputFields.push({title: link.title, url: link.url});
+                counter = counter + 1;
+            })
+            setInputFields(newInputFields);
         });
     }
 
-    function handleDeleteLink(button: LinkButton) {
-        setActiveButtons(activeButtons.filter((b: LinkButton) => b.key !== button.key))
-        // @ts-ignore
-        const linkToDelete: Link = links.find((link: Link) => link.title === button.label);
+    function handleDeleteLink(button: LinkButton, index: number) {
+        setActiveButtons(activeButtons.filter((b: LinkButton) => b.label !== button.label))
+        const newInputFields = [...inputFields];
+        newInputFields.splice(index, 1);
+        setInputFields(newInputFields);
+        const linkToDelete: Link | undefined = links.find((link: Link) => link.title === button.label);
         if (!linkToDelete) return
 
         toast.promise(
@@ -125,49 +161,17 @@ export default function LinkButtonComponent() {
         });
     }
 
-    function UserLinksComponent({button, value}: { button: LinkButton, value?: string }) {
-        let Icon: IconType = button.icon as (props: IconBaseProps) => JSX.Element;
-        return (
-            <div className="flex gap-2 items-center mb-2">
-                <MdDragIndicator className="cursor-grab"/>
-                <div className="flex-1 grid grid-cols-4 place-items-center gap-6" key={button.key}
-                     draggable={true}
-                     onDragStart={(e) => {
-                         e.preventDefault()
-                         e.stopPropagation()
-                     }}>
-                    <div className="flex gap-2 justify-center items-center mr-auto">
-
-                        <Icon/>
-                        <p>{button.label}</p>
-                    </div>
-                    <div className="flex justify-center items-center col-span-3 w-full gap-2">
-                        <Input variant={'underlined'} type={"text"} placeholder={"URL"} defaultValue={value} size={'sm'}
-                               ref={inputRef}/>
-                        <Button isIconOnly color="success" variant="faded" aria-label="save link"
-                                onClick={() => {
-                                    handleNewLink(button)
-                                }}>
-                            <IoMdSave/>
-                        </Button>
-                        <Button isIconOnly color="danger" variant="faded" aria-label="delete link"
-                                onClick={() => {
-                                    handleDeleteLink(button)
-                                }}>
-                            <AiOutlineDelete/>
-                        </Button>
-                        <Toaster/>
-                    </div>
-                </div>
-            </div>
-
-        )
+    const onLinkChange = (value: string | null, index: number) => {
+        if (value) {
+            let newInputFields = [...inputFields];
+            newInputFields[index].url = value;
+            setInputFields(newInputFields);
+        }
     }
 
     if (linksLoading.isLoading) {
         return <div className="grid place-items-center"><CircularProgress size="lg" aria-label="Loading..."/></div>
     }
-
 
     function handleSort() {
         const linksClone: Link[] = [...links]
@@ -187,6 +191,7 @@ export default function LinkButtonComponent() {
 
     return (
         <div className="w-full h-full flex flex-col">
+            {/*user links*/}
             <div>
                 {links.map((link: Link, index) => {
                     const button: LinkButton = {
@@ -194,6 +199,7 @@ export default function LinkButtonComponent() {
                         label: link.title,
                         icon: buttons.find((b: LinkButton) => b.label === link.title)?.icon
                     }
+                    let Icon: IconType = button.icon as (props: IconBaseProps) => JSX.Element;
                     return <div
                         draggable={true}
                         onDragStart={() => dragLink.current = index}
@@ -201,15 +207,68 @@ export default function LinkButtonComponent() {
                         onDragEnd={handleSort}
                         onDragOver={(e) => e.preventDefault()}
                     >
-                        <UserLinksComponent key={button.key} button={button}
-                                            value={link.url}/>
+
+                        <div className="flex gap-2 items-center mb-2">
+                            <MdDragIndicator className="cursor-grab"/>
+                            <div className="flex-1 grid grid-cols-4 place-items-center gap-6" key={button.key}
+                                 draggable={true}
+                                 onDragStart={(e) => {
+                                     e.preventDefault()
+                                     e.stopPropagation()
+                                 }}>
+                                <div className="flex gap-2 justify-center items-center mr-auto">
+                                    <Icon/>
+                                    <p>{button.label}</p>
+                                </div>
+                                <div className="flex justify-center items-center col-span-3 w-full gap-2">
+                                    <Input variant={'underlined'} type={"text"} placeholder={"URL"}
+                                           size={'sm'} defaultValue={link.url}
+                                           onChange={(e) => onLinkChange(e.target.value, index)}/>
+                                    <Button isIconOnly color="danger" variant="faded" aria-label="delete link"
+                                            onClick={() => {
+                                                handleDeleteLink(button, index)
+                                            }}>
+                                        <AiOutlineDelete/>
+                                    </Button>
+                                    <Toaster/>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 })}
             </div>
+
+            {/*link buttons*/}
             <div>
-                {activeButtons.map((button: LinkButton) => {
-                    if (!links.find((l: Link) => l.title === button.label))
-                        return <UserLinksComponent key={button.key} button={button}/>
+                {activeButtons.map((button: LinkButton, index) => {
+                    let Icon: IconType = button.icon as (props: IconBaseProps) => JSX.Element;
+                    if (!links.find((l: Link) => l.title === button.label)) {
+                        return <div className="flex gap-2 items-center mb-2">
+                            <MdDragIndicator className="cursor-grab"/>
+                            <div className="flex-1 grid grid-cols-4 place-items-center gap-6" draggable={true}
+                                 onDragStart={(e) => {
+                                     e.preventDefault()
+                                     e.stopPropagation()
+                                 }}>
+                                <div className="flex gap-2 justify-center items-center mr-auto">
+                                    <Icon/>
+                                    <p>{button.label}</p>
+                                </div>
+                                <div className="flex justify-center items-center col-span-3 w-full gap-2">
+                                    <Input variant={'underlined'} type={"text"} placeholder={"URL"}
+                                           size={'sm'}
+                                           onChange={(e) => onLinkChange(e.target.value, index)}/>
+                                    <Button isIconOnly color="danger" variant="faded" aria-label="delete link"
+                                            onClick={() => {
+                                                handleDeleteLink(button, index)
+                                            }}>
+                                        <AiOutlineDelete/>
+                                    </Button>
+                                    <Toaster/>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 })}
             </div>
 
@@ -223,6 +282,16 @@ export default function LinkButtonComponent() {
                                    startContent={<Icon/>} endContent={<FaPlus/>}
                                    onClick={() => addButton(button)}>{label}</Button>
                 })}
+            </div>
+
+            <div className="w-full flex items-center justify-center mt-6">
+                <Button isIconOnly color="success" variant="solid" aria-label="save link"
+                        className="w-full max-w-48 flex"
+                        onClick={() => {
+                            handleNewLink()
+                        }}>
+                    <IoMdSave/>
+                </Button>
             </div>
         </div>
     )

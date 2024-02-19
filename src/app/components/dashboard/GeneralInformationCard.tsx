@@ -3,16 +3,16 @@
 import {Button, Card, CardBody, CardHeader, Divider} from "@nextui-org/react";
 import InputBox from "@/app/components/auth/InputBox";
 import {IoMdSave} from "react-icons/io";
-import {AiOutlineDelete} from "react-icons/ai";
 import React, {useEffect, useState} from "react";
 import {useRecoilState, useRecoilValue} from "recoil";
 import {userState} from "@/store/atoms/user";
-import toast from "react-hot-toast";
+import toast, {Toaster} from "react-hot-toast";
 import {UpdateUser} from "@/app/actions";
 import {userDetailState} from "@/store/selectors/userDetails";
 import {isUserLoading} from "@/store/selectors/isUserLoading";
 import {MdOutlineCloudUpload} from "react-icons/md";
 import {UserUpdateBodySchema} from "../../../../lib/types";
+import {RxReset} from "react-icons/rx";
 
 export default function GeneralInformationCard() {
 
@@ -20,9 +20,9 @@ export default function GeneralInformationCard() {
     const userLoading = useRecoilValue(isUserLoading);
 
     const [user, setUser] = useRecoilState(userState);
-    const [firstname, setFirstname] = useState(user.firstname ? user.firstname : "");
-    const [lastname, setLastName] = useState(user.lastname ? user.lastname : "");
-    const [description, setDescription] = useState(user.description ? user.description : "");
+    const [firstname, setFirstname] = useState(user.firstname ?? "");
+    const [lastname, setLastName] = useState(user.lastname ?? "");
+    const [description, setDescription] = useState(user.description ?? "");
     const [userImage, setUserImage] = useState<File | null>(null);
     const [base64, setBase64] = useState<string | null>(null);
 
@@ -49,9 +49,9 @@ export default function GeneralInformationCard() {
     };
 
     function clearInputs() {
-        setFirstname(user.firstname ? user.firstname : "");
-        setLastName(user.lastname ? user.lastname : "");
-        setDescription(user.description ? user.description : "");
+        setFirstname(user.firstname ?? "");
+        setLastName(user.lastname ?? "");
+        setDescription(user.description ?? "");
     }
 
     function handleUserUpdate() {
@@ -120,13 +120,15 @@ export default function GeneralInformationCard() {
             <div className="flex flex-col gap-4 items-center mt-2 mb-4">
                 <div className="flex gap-2  items-center">
                     <p>Upload profile picture</p>
-                    <Button color="primary" variant={'flat'} endContent={<MdOutlineCloudUpload/>}>
+                    <Button color="primary" variant={'flat'} className="p-0">
                         <input type={"file"} name={"user_avatar"} id="file-input" className="hidden"
                                onChange={onFileChange}
                                onClick={onClick}/>
-                        <label htmlFor="file-input" className="cursor-pointer"
-                        >Select a File</label
-                        >
+                        <label htmlFor="file-input"
+                               className="w-full h-full p-2 flex gap-2 items-center cursor-pointer">
+                            Select a File
+                            <MdOutlineCloudUpload/>
+                        </label>
                     </Button>
                 </div>
                 {base64 && <img src={base64} width={300} height={400} alt="Uploaded Image"/>}
@@ -137,10 +139,11 @@ export default function GeneralInformationCard() {
                 <Button className="w-full text-md" variant={"solid"} color="primary"
                         startContent={<IoMdSave/>} onClick={() => handleUserUpdate()}>
                     Save</Button>
-                <Button className="w-full text-md" variant={"solid"} color="danger"
-                        startContent={<AiOutlineDelete/>} onClick={clearInputs}>
-                    Delete</Button>
+                <Button className="w-full text-md" variant={"solid"} color="secondary"
+                        startContent={<RxReset/>} onClick={clearInputs}>
+                    Reset</Button>
             </div>
         </CardBody>
+        <Toaster/>
     </Card>
 }

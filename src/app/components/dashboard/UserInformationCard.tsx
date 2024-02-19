@@ -11,7 +11,7 @@ import {useRecoilValue} from "recoil";
 import {userState} from "@/store/atoms/user";
 import {GetUserCustomUrl, UpdateBackgroundColor} from "@/app/actions";
 import {VscSymbolColor} from "react-icons/vsc";
-import {backgrounds} from "@/app/constants";
+import {backgrounds, profileUser} from "@/app/constants";
 
 type UserSettings = {
     customUrl: string,
@@ -91,7 +91,7 @@ export default function UserInformationCard() {
                             <Image
                                 isBlurred={true}
                                 alt="user profile image"
-                                src={user.profilePicture ? user.profilePicture : "/profile.jpg"}
+                                src={user.profilePicture ? user.profilePicture : profileUser}
                             />
                         </div>
                         <div className="grid place-items-center">
