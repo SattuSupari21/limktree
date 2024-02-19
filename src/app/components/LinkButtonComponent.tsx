@@ -285,12 +285,13 @@ export default function LinkButtonComponent() {
             </div>
 
             <div className="w-full flex items-center justify-center mt-6">
-                <Button isIconOnly color="success" variant="solid" aria-label="save link"
+                <Button color="success" variant="solid" aria-label="save link"
+                        startContent={<IoMdSave/>}
                         className="w-full max-w-48 flex"
                         onClick={() => {
                             handleNewLink()
                         }}>
-                    <IoMdSave/>
+                    Save
                 </Button>
             </div>
         </div>
