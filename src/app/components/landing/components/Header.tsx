@@ -26,7 +26,10 @@ import {profileUser} from "@/app/constants";
 
 export default function Header() {
     const router = useRouter();
-    const menuItems = ["Features", "About", "Login"];
+    const menuItems = [{itemName: "Features", linkTo: "/features"}, {itemName: "About", linkTo: "/about"}, {
+        itemName: "Login",
+        linkTo: "/auth/login"
+    }]
 
     const [user, setUser] = useRecoilState(userState);
     const userEmail = useRecoilValue(userEmailState);
@@ -144,8 +147,8 @@ export default function Header() {
                 <NavbarMenu>
                     {menuItems.map((item, index) => (
                         <NavbarMenuItem key={`${item}-${index}`}>
-                            <Link className="w-full" href="#" size="lg">
-                                {item}
+                            <Link className="w-full" href={item.linkTo} size="lg">
+                                {item.itemName}
                             </Link>
                         </NavbarMenuItem>
                     ))}

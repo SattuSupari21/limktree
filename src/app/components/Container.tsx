@@ -5,7 +5,7 @@ import React from "react";
 export default function Container({children}: { children: React.ReactNode }) {
     return (
         <main
-            className="h-screen w-screen">
+            className="w-screen h-screen">
             {children}
         </main>
     )

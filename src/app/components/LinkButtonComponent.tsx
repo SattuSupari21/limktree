@@ -201,6 +201,7 @@ export default function LinkButtonComponent() {
                     }
                     let Icon: IconType = button.icon as (props: IconBaseProps) => JSX.Element;
                     return <div
+                        key={button.key}
                         draggable={true}
                         onDragStart={() => dragLink.current = index}
                         onDragEnter={() => dragOverLink.current = index}
@@ -230,7 +231,6 @@ export default function LinkButtonComponent() {
                                             }}>
                                         <AiOutlineDelete/>
                                     </Button>
-                                    <Toaster/>
                                 </div>
                             </div>
                         </div>
@@ -244,12 +244,8 @@ export default function LinkButtonComponent() {
                     let Icon: IconType = button.icon as (props: IconBaseProps) => JSX.Element;
                     if (!links.find((l: Link) => l.title === button.label)) {
                         return <div className="flex gap-2 items-center mb-2">
-                            <MdDragIndicator className="cursor-grab"/>
-                            <div className="flex-1 grid grid-cols-4 place-items-center gap-6" draggable={true}
-                                 onDragStart={(e) => {
-                                     e.preventDefault()
-                                     e.stopPropagation()
-                                 }}>
+                            <MdDragIndicator className="cursor-grab active:cursor-grabbing"/>
+                            <div className="flex-1 grid grid-cols-4 place-items-center gap-6">
                                 <div className="flex gap-2 justify-center items-center mr-auto">
                                     <Icon/>
                                     <p>{button.label}</p>
@@ -264,7 +260,6 @@ export default function LinkButtonComponent() {
                                             }}>
                                         <AiOutlineDelete/>
                                     </Button>
-                                    <Toaster/>
                                 </div>
                             </div>
                         </div>
@@ -294,6 +289,7 @@ export default function LinkButtonComponent() {
                     Save
                 </Button>
             </div>
+            <Toaster/>
         </div>
     )
 }
